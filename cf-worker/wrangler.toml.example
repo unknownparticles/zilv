@@ -1,0 +1,41 @@
+# Cloudflare Workers 部署配置文件模板
+# 部署前请复制此文件并重命名为 wrangler.toml，然后修改对应配置
+
+name = "self-discipline-backend"
+main = "src/index.ts"
+compatibility_date = "2024-10-22"
+
+# 绑定 Cloudflare KV 用于存储用户信息、同步数据与激活码
+# 在 Cloudflare 控制台或使用命令行创建 KV 命名空间：
+# wrangler kv:namespace create KV_STORE
+# 将返回的 id 填入下方
+[[kv_namespaces]]
+binding = "KV"
+id = "YOUR_KV_NAMESPACE_ID_HERE"
+
+[vars]
+# 默认的 AI 服务商名称，可以配置为: "SiliconFlow", "Minimax", "GLM", "DeepSeek", "Kimi"
+DEFAULT_AI_PROVIDER = "SiliconFlow"
+
+# 默认的模型名称，根据选用的提供商，如果前端未指定，会使用这些默认值
+MODEL_SILICONFLOW = "deepseek-ai/DeepSeek-V4-Flash"
+MODEL_SILICONFLOW_VISION = "Pro/moonshotai/Kimi-K2.5"
+
+MODEL_MINIMAX = "abab6.5g-chat"
+MODEL_MINIMAX_VISION = "abab6.5s-chat"
+
+MODEL_GLM = "glm-4-flash"
+MODEL_GLM_VISION = "glm-4v-flash"
+
+MODEL_DEEPSEEK = "deepseek-chat"
+
+MODEL_KIMI = "moonshot-v1-8k"
+MODEL_KIMI_VISION = "moonshot-v1-8k-vision-preview"
+
+# 注意：请勿在此明文填写您的 API Key！
+# 请使用 wrangler secret 指令将秘钥安全地挂载到 Worker 中：
+# wrangler secret put SILICONFLOW_API_KEY
+# wrangler secret put MINIMAX_API_KEY
+# wrangler secret put ZHIPU_API_KEY
+# wrangler secret put DEEPSEEK_API_KEY
+# wrangler secret put KIMI_API_KEY

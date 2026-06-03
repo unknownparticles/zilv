@@ -1,0 +1,17 @@
+{
+  "name": "自律修行管家",
+  "short_name": "自律管家",
+  "description": "设计启发性、实用且高度现实的习惯和目标，助您掌控生活的广角尺度。",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
