@@ -129,7 +129,7 @@ export default function App() {
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
 
   // Worker and AI states
-  const [workerApiUrl, setWorkerApiUrl] = useState(() => localStorage.getItem("min_worker_api_url") || "");
+  const [workerApiUrl, setWorkerApiUrl] = useState(() => localStorage.getItem("min_worker_api_url") || "https://zilv.alunapi.top");
   const [authInviteCode, setAuthInviteCode] = useState("");
   const [aiSubTab, setAiSubTab] = useState<"diet" | "workout" | "challenge" | "learning">("diet");
   
@@ -324,10 +324,7 @@ export default function App() {
 
   // Request Cloudflare Helper
   const requestCF = async (path: string, options: RequestInit = {}) => {
-    const workerUrl = localStorage.getItem("min_worker_api_url") || "";
-    if (!workerUrl) {
-      throw new Error("请先在‘设置页’配置 Cloudflare Worker API 地址哦！");
-    }
+    const workerUrl = workerApiUrl || "https://zilv.alunapi.top";
     const token = localStorage.getItem("min_cf_token") || "";
     const apiProvider = session.apiProvider || "SiliconFlow";
 

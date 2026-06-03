@@ -104,7 +104,7 @@ export default function CheckInModal({
 
     try {
       const base64Data = await resizeAndBase64(file);
-      const workerUrl = localStorage.getItem("min_worker_api_url") || "";
+      const workerUrl = localStorage.getItem("min_worker_api_url") || "https://zilv.alunapi.top";
       const token = localStorage.getItem("min_cf_token") || "";
       const sessionRaw = localStorage.getItem("min_user_session");
       let provider = "SiliconFlow";
