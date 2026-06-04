@@ -618,6 +618,17 @@ export default function App() {
     setStudyRecords([newRecord, ...studyRecords]);
   };
 
+  const handleAddWater = (rec: { amount: number }) => {
+    const todayStr = new Date().toISOString().split("T")[0];
+    const newRecord: WaterRecord = {
+      id: crypto.randomUUID(),
+      date: todayStr,
+      time: new Date().toTimeString().split(" ")[0].slice(0, 5), // "HH:MM"
+      amount: rec.amount,
+    };
+    setWaterRecords([newRecord, ...waterRecords]);
+  };
+
   const calculateDuration = (sleep: string, wake: string): number => {
     try {
       const [sh, sm] = sleep.split(":").map(Number);
@@ -2895,6 +2906,7 @@ export default function App() {
         onAddDiet={handleAddDiet}
         onAddWorkout={handleAddWorkout}
         onAddStudy={handleAddStudy}
+        onAddWater={handleAddWater}
         isAnalyzingImage={isAnalyzingImage}
         setIsAnalyzingImage={setIsAnalyzingImage}
       />
