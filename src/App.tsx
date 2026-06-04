@@ -37,7 +37,9 @@ import {
   Check,
   Eye,
   EyeOff,
-  Sparkles
+  Sparkles,
+  Compass,
+  Brain
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
