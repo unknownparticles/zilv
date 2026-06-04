@@ -597,22 +597,22 @@ export default function App() {
     setMustDoTasks(mustDoTasks.filter((t) => t.id !== id));
   };
 
-  // Pre-seed some default accounts dynamically
+  // Pre-seed some default accounts dynamically (Removed admin pre-seed to prevent abuse)
   useEffect(() => {
     const regUsersRaw = localStorage.getItem("min_registered_users");
     if (!regUsersRaw) {
-      const initialUsers = [
-        {
-          username: "admin",
-          password: "123",
-          nickname: "超级自律大师",
-          id: "SLF-2026-X99",
-          avatar: DEFAULT_AVATARS[2],
-          apiProvider: "Google AI Studio",
-          apiKey: "",
+      localStorage.setItem("min_registered_users", JSON.stringify([]));
+    } else {
+      // 过滤已经存在的本地 admin 账号，防止滥用
+      try {
+        const users = JSON.parse(regUsersRaw);
+        if (Array.isArray(users)) {
+          const filtered = users.filter((u: any) => u.username !== "admin");
+          if (filtered.length !== users.length) {
+            localStorage.setItem("min_registered_users", JSON.stringify(filtered));
+          }
         }
-      ];
-      localStorage.setItem("min_registered_users", JSON.stringify(initialUsers));
+      } catch (e) {}
     }
   }, []);
 
@@ -627,6 +627,10 @@ export default function App() {
     }
 
     const normalizedUser = authUsername.trim().toLowerCase();
+    if (normalizedUser === "admin") {
+      setAuthError("为防止滥用，admin 账号已被禁用。");
+      return;
+    }
     if (!/^[a-z0-9_]+$/.test(normalizedUser)) {
       setAuthError("账号登录名只能包含英文字母、数字和下划线哦！");
       return;
@@ -1175,11 +1179,7 @@ export default function App() {
                 {isLoginView ? "🆕 还没有账号？点击创建新账号" : "👈 已经有账号？返回直接登录"}
               </button>
               
-              {/* Seeding credentials info card */}
-              <div className="w-full bg-slate-50 border border-slate-150 p-2 text-[10px] rounded-lg text-slate-500 flex flex-col items-center">
-                <span className="font-bold text-slate-700">💡 快速体验账号：</span>
-                <span className="font-mono">用户名: <strong className="text-slate-800 underline">admin</strong> | 密码: <strong className="text-slate-800 underline">123</strong></span>
-              </div>
+
             </div>
 
           </div>

@@ -105,6 +105,12 @@ export default {
         }
 
         const normalizedUsername = username.trim().toLowerCase();
+        if (normalizedUsername === "admin") {
+          return new Response(JSON.stringify({ error: "为防止滥用，admin 账号已被禁用。" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
 
         // Check if user already exists
         const existingUser = await env.KV.get(`user:${normalizedUsername}`);
@@ -166,6 +172,12 @@ export default {
         }
 
         const normalizedUsername = username.trim().toLowerCase();
+        if (normalizedUsername === "admin") {
+          return new Response(JSON.stringify({ error: "为防止滥用，admin 账号已被禁用。" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
         const userRaw = await env.KV.get(`user:${normalizedUsername}`);
         if (!userRaw) {
           return new Response(JSON.stringify({ error: "账号或密码错误，请重试。" }), {
