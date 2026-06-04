@@ -248,7 +248,14 @@ export default {
         });
       }
 
-      if (path === "/api/shortcuts/import" && request.method === "POST") {
+      if (path === "/api/shortcuts/import") {
+        if (request.method !== "POST") {
+          return new Response(JSON.stringify({ error: "该接口仅支持 POST 方法数据导入。" }), {
+            status: 405,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
+
         const username = await getAuthorizedUser(request, env);
         if (!username) {
           return new Response(JSON.stringify({ error: "未授权，快捷指令 Token 无效。" }), {
@@ -257,7 +264,15 @@ export default {
           });
         }
 
-        const input = await request.json() as any;
+        let input: any;
+        try {
+          input = await request.json();
+        } catch (e) {
+          return new Response(JSON.stringify({ error: "请求体解析失败，请发送合法的 JSON 数据。" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
         const dataRaw = await env.KV.get(`data:${username}`) || "{}";
         const data = JSON.parse(dataRaw);
 
@@ -807,6 +822,21 @@ export default {
 
         return new Response(JSON.stringify({ message: `🔥 狂暴魔鬼模式启动成功！在接下来的 ${binding.rageModeTargetDays} 天里全勤坚持以取回保证金！`, rageModeTargetDays: binding.rageModeTargetDays }), {
           status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
+      }
+
+      // 兜底：如果前面没有任何 API 路由匹配上，且也不是合法的 AI 代理路由，直接返回 404
+      const aiRoutes = [
+        "/api/diet-advice",
+        "/api/workout-plan",
+        "/api/skill-challenge",
+        "/api/learning-path",
+        "/api/analyze-diet-image"
+      ];
+      if (!aiRoutes.includes(path)) {
+        return new Response(JSON.stringify({ error: "未找到请求的接口或不支持该请求方式。" }), {
+          status: 404,
           headers: { ...corsHeaders, "Content-Type": "application/json" }
         });
       }
