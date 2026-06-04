@@ -59,6 +59,108 @@ const DEFAULT_AVATARS = [
   "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80"
 ];
 
+const SHORTCUT_TEMPLATE = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>WFWorkflowActions</key>
+	<array>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.text</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>WFTextActionText</key>
+				<string>__TOKEN__</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.text</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>WFTextActionText</key>
+				<string>{"date": "yyyy-MM-dd", "source": "apple_shortcuts", "steps": null, "active_energy_kcal": null, "sleep_minutes": null, "weight_kg": null}</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.url</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>WFURLActionURL</key>
+				<string>__URL__</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.downloadurl</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>WFHTTPBodyType</key>
+				<string>JSON</string>
+				<key>WFHTTPHeaders</key>
+				<dict>
+					<key>Authorization</key>
+					<string>Bearer __TOKEN__</string>
+					<key>Content-Type</key>
+					<string>application/json</string>
+				</dict>
+				<key>WFHTTPMethod</key>
+				<string>POST</string>
+				<key>WFRequestBody</key>
+				<dict>
+					<key>Value</key>
+					<string>__HEALTH_JSON__</string>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenString</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.notification</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>WFNotificationActionBody</key>
+				<string>已尝试上传今日健康数据</string>
+				<key>WFNotificationActionTitle</key>
+				<string>健康数据上传完成</string>
+			</dict>
+		</dict>
+	</array>
+	<key>WFWorkflowClientVersion</key>
+	<string>3300</string>
+	<key>WFWorkflowIcon</key>
+	<dict>
+		<key>WFWorkflowIconGlyphNumber</key>
+		<integer>59720</integer>
+		<key>WFWorkflowIconStartColor</key>
+		<integer>4274264319</integer>
+	</dict>
+	<key>WFWorkflowImportQuestions</key>
+	<array/>
+	<key>WFWorkflowInputContentItemClasses</key>
+	<array>
+		<string>WFStringContentItem</string>
+		<string>WFURLContentItem</string>
+		<string>WFGenericFileContentItem</string>
+	</array>
+	<key>WFWorkflowMinimumClientVersion</key>
+	<integer>900</integer>
+	<key>WFWorkflowMinimumClientVersionString</key>
+	<string>900</string>
+	<key>WFWorkflowName</key>
+	<string>上传今日健康数据到API</string>
+	<key>WFWorkflowTypes</key>
+	<array>
+		<string>NCWidget</string>
+		<string>ActionExtension</string>
+	</array>
+</dict>
+</plist>
+`;
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<"home" | "mustdo" | "settings" | "ai_studio">("home");
   const [motto, setMotto] = useState("");
@@ -167,6 +269,38 @@ export default function App() {
     const raw = localStorage.getItem("min_ai_learning_path");
     return raw ? JSON.parse(raw) : null;
   });
+
+  // 处理苹果快捷指令模板的动态配置与下载
+  const handleDownloadShortcut = () => {
+    const token = localStorage.getItem("min_cf_token") || "";
+    if (!token) {
+      alert("❌ 无法生成：请先在自律助手云端登录或注册，以便生成带您专属 Token 的快捷指令！");
+      return;
+    }
+
+    const apiUrl = `${workerApiUrl.replace(/\/$/, "")}/api/shortcuts/import`;
+    // 默认提供今天健康字典的变量占位符以配合快捷指令原有的输入引用结构
+    const defaultJson = '{"sleep":{"sleepTime":"23:00","wakeTime":"07:30"},"water":{"amount":250}}';
+
+    let content = SHORTCUT_TEMPLATE;
+    content = content.replace(/__TOKEN__/g, token);
+    content = content.replace(/__URL__/g, apiUrl);
+    content = content.replace(/__HEALTH_JSON__/g, defaultJson);
+
+    try {
+      const blob = new Blob([content], { type: "application/octet-stream" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "上传今日健康数据到API.shortcut";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert("❌ 快捷指令生成失败，请稍后重试！");
+    }
+  };
 
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiError, setAiError] = useState("");
@@ -2797,6 +2931,21 @@ export default function App() {
                                 复制
                               </button>
                             </div>
+                          </div>
+
+                          {/* 专属快捷指令一键配置下载 */}
+                          <div className="space-y-1 pt-1">
+                            <span className="text-[9.5px] font-bold text-slate-400 block uppercase font-sans">3. 专属快捷指令一键配置下载</span>
+                            <button
+                              type="button"
+                              onClick={handleDownloadShortcut}
+                              className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-2.5 px-4 rounded-xl shadow-sm transition-all text-[11px] cursor-pointer animate-pulse-subtle"
+                            >
+                              <span>📥 下载专属配置快捷指令 (.shortcut)</span>
+                            </button>
+                            <span className="text-[9px] text-slate-400 block font-sans text-center mt-1 leading-snug">
+                              内置您的 API Token 与接口 URL，在 iPhone 导入后即可直接零配置一键运行！
+                            </span>
                           </div>
                         </div>
 
