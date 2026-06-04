@@ -248,6 +248,129 @@ export default {
         });
       }
 
+      if (path === "/api/shortcuts/import" && request.method === "POST") {
+        const username = await getAuthorizedUser(request, env);
+        if (!username) {
+          return new Response(JSON.stringify({ error: "未授权，快捷指令 Token 无效。" }), {
+            status: 401,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
+
+        const input = await request.json() as any;
+        const dataRaw = await env.KV.get(`data:${username}`) || "{}";
+        const data = JSON.parse(dataRaw);
+
+        // 初始化各个记录列表
+        if (!data.sleepRecords) data.sleepRecords = [];
+        if (!data.mealItems) data.mealItems = [];
+        if (!data.workoutRecords) data.workoutRecords = [];
+        if (!data.studyRecords) data.studyRecords = [];
+        if (!data.waterRecords) data.waterRecords = [];
+        if (!data.weightRecords) data.weightRecords = [];
+
+        const todayStr = new Date().toISOString().split("T")[0];
+        const nowTimeStr = new Date().toTimeString().split(" ")[0].slice(0, 5); // "HH:MM"
+        const importedItems: string[] = [];
+
+        // 1. 睡眠数据导入
+        if (input.sleep) {
+          const sleepTime = input.sleep.sleepTime || "23:00";
+          const wakeTime = input.sleep.wakeTime || "07:30";
+          
+          // 简易时差计算
+          const calculateDuration = (s: string, w: string): number => {
+            try {
+              const [sh, sm] = s.split(":").map(Number);
+              const [wh, wm] = w.split(":").map(Number);
+              let diff = (wh * 60 + wm) - (sh * 60 + sm);
+              if (diff < 0) diff += 24 * 60;
+              return Math.round((diff / 60) * 10) / 10;
+            } catch {
+              return 8;
+            }
+          };
+          const duration = calculateDuration(sleepTime, wakeTime);
+
+          const newSleep = {
+            id: crypto.randomUUID(),
+            date: todayStr,
+            sleepTime,
+            wakeTime,
+            duration,
+            quality: Number(input.sleep.quality || 5),
+            note: input.sleep.note || "由苹果健康快捷指令自动同步"
+          };
+          data.sleepRecords.unshift(newSleep);
+          importedItems.push("睡眠");
+        }
+
+        // 2. 运动数据导入
+        if (input.workout) {
+          const type = input.workout.type || "有氧健身";
+          const duration = Number(input.workout.duration || 30);
+          const calories = Number(input.workout.calories || Math.round(duration * 6.5));
+          
+          const newWorkout = {
+            id: crypto.randomUUID(),
+            date: todayStr,
+            type,
+            duration,
+            calories,
+            intensity: input.workout.intensity || "中"
+          };
+          data.workoutRecords.unshift(newWorkout);
+          importedItems.push("运动");
+        }
+
+        // 3. 喝水数据导入
+        if (input.water) {
+          const amount = Number(input.water.amount || 250);
+          const newWater = {
+            id: crypto.randomUUID(),
+            date: todayStr,
+            time: nowTimeStr,
+            amount
+          };
+          data.waterRecords.unshift(newWater);
+          importedItems.push("喝水");
+        }
+
+        // 4. 体重数据导入
+        if (input.weight) {
+          const weight = Number(input.weight.weight);
+          if (!isNaN(weight) && weight > 0) {
+            const newWeight = {
+              id: crypto.randomUUID(),
+              date: todayStr,
+              time: nowTimeStr,
+              weight,
+              note: input.weight.note || "由健康快捷指令自动导入"
+            };
+            data.weightRecords.unshift(newWeight);
+            importedItems.push("体重");
+          }
+        }
+
+        if (importedItems.length === 0) {
+          return new Response(JSON.stringify({ error: "未传入任何合法的打卡数据(sleep, workout, water, weight)。" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
+
+        // 保存更新至云端 KV
+        await env.KV.put(`data:${username}`, JSON.stringify(data));
+
+        return new Response(JSON.stringify({
+          message: `🎉 快捷指令成功导入: ${importedItems.join("、")}`,
+          imported: importedItems
+        }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
+      }
+
       // ==========================================
       // 3. User Bonding (Wagering Streak System)
       // ==========================================

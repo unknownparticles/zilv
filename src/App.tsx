@@ -9,6 +9,7 @@ import {
   WagerBinding,
   WagerInvite,
   WaterRecord,
+  WeightRecord,
 } from "./types";
 import CheckInModal from "./components/CheckInModal";
 import {
@@ -16,6 +17,8 @@ import {
   Utensils,
   Dumbbell,
   BookOpen,
+  Droplet,
+  Scale,
   Award,
   User,
   Settings,
@@ -83,6 +86,11 @@ export default function App() {
 
   const [waterRecords, setWaterRecords] = useState<WaterRecord[]>(() => {
     const raw = localStorage.getItem("min_water_records");
+    return raw ? JSON.parse(raw) : [];
+  });
+
+  const [weightRecords, setWeightRecords] = useState<WeightRecord[]>(() => {
+    const raw = localStorage.getItem("min_weight_records");
     return raw ? JSON.parse(raw) : [];
   });
 
@@ -491,6 +499,10 @@ export default function App() {
     localStorage.setItem("min_user_session", JSON.stringify(session));
   }, [session]);
 
+  useEffect(() => {
+    localStorage.setItem("min_weight_records", JSON.stringify(weightRecords));
+  }, [weightRecords]);
+
   // 自动同步打卡数据到云端（已登录且有网络时静默进行）
   useEffect(() => {
     // 避免在刚加载组件时，由于本地 state 还没得到云端合并就发起覆盖上传
@@ -518,6 +530,7 @@ export default function App() {
           studyRecords,
           mustDoTasks,
           waterRecords,
+          weightRecords,
         };
         
         await fetch(`${workerApiUrl.replace(/\/$/, "")}/api/sync/upload`, {
@@ -535,7 +548,7 @@ export default function App() {
     }, 800);
 
     return () => clearTimeout(delayDebounce);
-  }, [sleepRecords, mealItems, workoutRecords, studyRecords, mustDoTasks, waterRecords]);
+  }, [sleepRecords, mealItems, workoutRecords, studyRecords, mustDoTasks, waterRecords, weightRecords]);
 
   // Adjust input elements automatically if session refreshes
   useEffect(() => {
@@ -736,6 +749,7 @@ export default function App() {
               if (cloudData.studyRecords) setStudyRecords(cloudData.studyRecords);
               if (cloudData.mustDoTasks) setMustDoTasks(cloudData.mustDoTasks);
               if (cloudData.waterRecords) setWaterRecords(cloudData.waterRecords);
+              if (cloudData.weightRecords) setWeightRecords(cloudData.weightRecords);
             }
           } catch (syncErr) {
             console.error("同步失败:", syncErr);
@@ -802,6 +816,8 @@ export default function App() {
           if (found.workoutRecords) setWorkoutRecords(found.workoutRecords);
           if (found.studyRecords) setStudyRecords(found.studyRecords);
           if (found.mustDoTasks) setMustDoTasks(found.mustDoTasks);
+          if (found.waterRecords) setWaterRecords(found.waterRecords);
+          if (found.weightRecords) setWeightRecords(found.weightRecords);
 
           setAuthSuccess("🎉 登录验证成功！欢迎进入自律宇宙（本地单机模式）。");
           setTimeout(() => {
@@ -864,6 +880,8 @@ export default function App() {
             workoutRecords,
             studyRecords,
             mustDoTasks,
+            waterRecords,
+            weightRecords,
           };
         }
         return u;
@@ -886,6 +904,8 @@ export default function App() {
     setMealItems([]);
     setWorkoutRecords([]);
     setStudyRecords([]);
+    setWaterRecords([]);
+    setWeightRecords([]);
     setDietAdvice(null);
     setWorkoutPlan(null);
     setSkillChallenge(null);
@@ -921,6 +941,8 @@ export default function App() {
           workoutRecords,
           studyRecords,
           mustDoTasks,
+          waterRecords,
+          weightRecords,
         };
       }
       return u;
@@ -937,6 +959,7 @@ export default function App() {
         studyRecords,
         mustDoTasks,
         waterRecords,
+        weightRecords,
       };
       fetch(`${workerApiUrl.replace(/\/$/, "")}/api/sync/upload`, {
         method: "POST",
@@ -965,6 +988,7 @@ export default function App() {
         studyRecords,
         mustDoTasks,
         waterRecords,
+        weightRecords,
       }
     };
     const blob = new Blob([JSON.stringify(minBackup, null, 2)], { type: "application/json" });
@@ -991,6 +1015,7 @@ export default function App() {
           if (parsed.data.studyRecords) setStudyRecords(parsed.data.studyRecords);
           if (parsed.data.mustDoTasks) setMustDoTasks(parsed.data.mustDoTasks);
           if (parsed.data.waterRecords) setWaterRecords(parsed.data.waterRecords);
+          if (parsed.data.weightRecords) setWeightRecords(parsed.data.weightRecords);
           if (parsed.user) {
             setSession({
               ...parsed.user,
@@ -1025,6 +1050,7 @@ export default function App() {
         studyRecords,
         mustDoTasks,
         waterRecords,
+        weightRecords,
       };
       
       const token = localStorage.getItem("min_cf_token") || "";
@@ -1062,6 +1088,7 @@ export default function App() {
         if (cloudData.studyRecords) setStudyRecords(cloudData.studyRecords);
         if (cloudData.mustDoTasks) setMustDoTasks(cloudData.mustDoTasks);
         if (cloudData.waterRecords) setWaterRecords(cloudData.waterRecords);
+        if (cloudData.weightRecords) setWeightRecords(cloudData.weightRecords);
         
         setTimeout(() => {
           skipAutoUpload.current = false;
@@ -1092,6 +1119,7 @@ export default function App() {
     const workouts = workoutRecords.filter((w) => w.date === todayStr);
     const studies = studyRecords.filter((st) => st.date === todayStr);
     const waters = waterRecords.filter((w) => w.date === todayStr);
+    const weights = weightRecords.filter((w) => w.date === todayStr);
 
     return {
       sleeps,
@@ -1099,7 +1127,8 @@ export default function App() {
       workouts,
       studies,
       waters,
-      totalCount: sleeps.length + meals.length + workouts.length + studies.length + waters.length,
+      weights,
+      totalCount: sleeps.length + meals.length + workouts.length + studies.length + waters.length + weights.length,
     };
   };
 
@@ -1805,6 +1834,68 @@ export default function App() {
                               <span className="shrink-0">
                                 <button
                                   onClick={() => setStudyRecords(studyRecords.filter(s => s.id !== record.id))}
+                                  className="text-[10px] text-slate-300 hover:text-rose-500 transition-colors cursor-pointer"
+                                >
+                                  删除
+                                </button>
+                              </span>
+                            </div>
+                          ))}
+
+                          {/* Waters */}
+                          {activeCheckIns.waters.map((record) => (
+                            <div key={record.id} className="flex gap-3 bg-slate-50/70 border border-slate-200 p-3 rounded-xl justify-between group">
+                              <div className="flex items-start gap-2.5">
+                                <div className="bg-sky-500 p-1.5 text-white rounded-lg shrink-0 mt-0.5">
+                                  <Droplet size={12} />
+                                </div>
+                                <div className="space-y-0.5">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-bold text-slate-850 text-xs">🥛 补水喝水打卡</span>
+                                    <span className="text-[9px] bg-sky-100 text-sky-850 px-1.5 rounded font-bold font-mono">
+                                      {record.amount} ml
+                                    </span>
+                                  </div>
+                                  <p className="text-slate-450 font-semibold text-[10px] pt-0.5">
+                                    记录时间：{record.time}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <span className="shrink-0">
+                                <button
+                                  onClick={() => setWaterRecords(waterRecords.filter(w => w.id !== record.id))}
+                                  className="text-[10px] text-slate-300 hover:text-rose-500 transition-colors cursor-pointer"
+                                >
+                                  删除
+                                </button>
+                              </span>
+                            </div>
+                          ))}
+
+                          {/* Weights */}
+                          {activeCheckIns.weights.map((record) => (
+                            <div key={record.id} className="flex gap-3 bg-slate-50/70 border border-slate-200 p-3 rounded-xl justify-between group">
+                              <div className="flex items-start gap-2.5">
+                                <div className="bg-amber-500 p-1.5 text-white rounded-lg shrink-0 mt-0.5">
+                                  <Scale size={12} />
+                                </div>
+                                <div className="space-y-0.5">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-bold text-slate-850 text-xs">⚖️ 体重记录</span>
+                                    <span className="text-[9px] bg-amber-100 text-amber-850 px-1.5 rounded font-bold font-mono">
+                                      {record.weight} kg
+                                    </span>
+                                  </div>
+                                  <p className="text-slate-450 font-semibold text-[10px] pt-0.5">
+                                    记录时间：{record.time} {record.note && `(${record.note})`}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <span className="shrink-0">
+                                <button
+                                  onClick={() => setWeightRecords(weightRecords.filter(w => w.id !== record.id))}
                                   className="text-[10px] text-slate-300 hover:text-rose-500 transition-colors cursor-pointer"
                                 >
                                   删除
@@ -2625,6 +2716,96 @@ export default function App() {
                             onChange={handleImportJSON}
                             className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                           />
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    {/* iOS Shortcuts configuration panel */}
+                    <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs space-y-4">
+                      
+                      <div className="border-b border-slate-100 pb-2 flex items-center justify-between select-none">
+                        <h4 className="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                          <span className="text-sm">📱</span>
+                          <span>iOS 苹果健康快捷指令联动</span>
+                        </h4>
+                        <span className="text-[8px] bg-indigo-50 text-indigo-700 font-extrabold px-2 py-0.5 rounded-full border border-indigo-100 uppercase">
+                          快捷接入
+                        </span>
+                      </div>
+
+                      <div className="space-y-3.5 text-left text-[11px] text-slate-600 leading-normal">
+                        <p className="font-semibold text-slate-700">
+                          支持通过苹果“快捷指令” App 从苹果健康中一键读取您今日的 <strong className="text-slate-950 font-bold">睡眠、运动、喝水量、体重</strong>，并静默同步导入云端！
+                        </p>
+                        
+                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2.5 font-mono text-[10px]">
+                          {/* Endpoint */}
+                          <div className="space-y-1">
+                            <span className="text-[9.5px] font-bold text-slate-400 block uppercase font-sans">1. 快捷指令请求 URL (POST)</span>
+                            <div className="flex items-center gap-2 bg-white border border-slate-200 p-2 rounded-lg justify-between">
+                              <span className="truncate select-all text-slate-800 font-bold">
+                                {`${workerApiUrl.replace(/\/$/, "")}/api/shortcuts/import`}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(`${workerApiUrl.replace(/\/$/, "")}/api/shortcuts/import`);
+                                  alert("📋 快捷指令导入 URL 已成功复制到剪贴板！");
+                                }}
+                                className="text-[9.5px] text-indigo-600 font-black cursor-pointer shrink-0 hover:underline hover:text-indigo-800"
+                              >
+                                复制
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Authorization Token */}
+                          <div className="space-y-1">
+                            <span className="text-[9.5px] font-bold text-slate-400 block uppercase font-sans">2. 请求头 Authorization 字段</span>
+                            <div className="flex items-center gap-2 bg-white border border-slate-200 p-2 rounded-lg justify-between">
+                              <span className="truncate select-all text-slate-800 font-bold">
+                                {`Bearer ${localStorage.getItem("min_cf_token") || "您尚未在云端登录"}`}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const token = localStorage.getItem("min_cf_token") || "";
+                                  if (!token) {
+                                    alert("❌ 无法拷贝：请先在云端完成注册或登录！");
+                                    return;
+                                  }
+                                  navigator.clipboard.writeText(`Bearer ${token}`);
+                                  alert("📋 Authorization Bearer 令牌已复制！请直接作为快捷指令 Request Header 填入。");
+                                }}
+                                className="text-[9.5px] text-indigo-600 font-black cursor-pointer shrink-0 hover:underline hover:text-indigo-800"
+                              >
+                                复制
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Usage instruction */}
+                        <div className="space-y-2 text-[10.5px]">
+                          <div className="flex items-start gap-1">
+                            <span className="text-xs text-indigo-600 font-bold mt-0.5">&bull;</span>
+                            <p><strong>指令配置方法</strong>：在快捷指令“获取 URL 内容”操作中，设置方法为 <strong className="text-slate-900 font-black">POST</strong>，添加 Header <code className="bg-slate-100 p-0.5 rounded font-mono text-[10px]">Authorization</code>，Value 填入复制的 Bearer 令牌。</p>
+                          </div>
+                          <div className="flex items-start gap-1">
+                            <span className="text-xs text-indigo-600 font-bold mt-0.5">&bull;</span>
+                            <p><strong>请求体配置 (JSON)</strong>：在请求体中，以 JSON 键值对传递您想导入的数据。例如：
+                              <code className="block bg-slate-100 p-2 rounded font-mono text-[9px] mt-1 whitespace-pre">
+{`{
+  "water": { "amount": 250 },
+  "weight": { "weight": 70.5 },
+  "workout": { "type": "户外跑步", "duration": 40 },
+  "sleep": { "sleepTime": "23:00", "wakeTime": "07:30" }
+}`}
+                              </code>
+                            </p>
+                          </div>
                         </div>
 
                       </div>

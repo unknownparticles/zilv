@@ -166,4 +166,12 @@ export interface WaterRecord {
   amount: number; // ml
 }
 
+export interface WeightRecord {
+  id: string;
+  date: string; // YYYY-MM-DD
+  time: string; // "14:30"
+  weight: number; // kg
+  note?: string;
+}
+
 
