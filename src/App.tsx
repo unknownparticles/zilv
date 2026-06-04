@@ -617,7 +617,7 @@ export default function App() {
     }
 
     const normalizedUser = authUsername.trim().toLowerCase();
-    const workerUrl = localStorage.getItem("min_worker_api_url") || "";
+    const workerUrl = workerApiUrl || "https://zilv.alunapi.top";
 
     if (workerUrl) {
       // ----------------- CLOUDFLARE WORKER CLOUD AUTH -----------------
@@ -937,12 +937,7 @@ export default function App() {
 
   // Sync animation simulation
   const handleCloudSync = async () => {
-    const workerUrl = localStorage.getItem("min_worker_api_url") || "";
-    if (!workerUrl) {
-      setSyncStatus("⚠️ 同步失败：请先在‘设置页’配置 Cloudflare Worker API 地址。");
-      setTimeout(() => setSyncStatus(null), 3000);
-      return;
-    }
+    const workerUrl = workerApiUrl || "https://zilv.alunapi.top";
     
     setIsSyncing(true);
     setSyncStatus("正在合流云端自律行囊...");
