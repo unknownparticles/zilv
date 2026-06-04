@@ -617,6 +617,10 @@ export default function App() {
     }
 
     const normalizedUser = authUsername.trim().toLowerCase();
+    if (!/^[a-z0-9_]+$/.test(normalizedUser)) {
+      setAuthError("账号登录名只能包含英文字母、数字和下划线哦！");
+      return;
+    }
     const workerUrl = workerApiUrl || "https://zilv.alunapi.top";
 
     if (workerUrl) {
@@ -1066,9 +1070,12 @@ export default function App() {
                 <input
                   type="text"
                   required
-                  placeholder="请输入您的英文名称"
+                  placeholder="请输入您的英文账号（如 alun）"
                   value={authUsername}
-                  onChange={(e) => setAuthUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+                  onChange={(e) => setAuthUsername(e.target.value)}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck="false"
                   className="w-full text-xs border border-slate-205 rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-slate-500 bg-slate-50 font-medium text-slate-800"
                 />
               </div>
