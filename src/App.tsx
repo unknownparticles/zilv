@@ -2944,7 +2944,7 @@ export default function App() {
                               <span>📥 下载专属配置快捷指令 (.shortcut)</span>
                             </button>
                             <span className="text-[9px] text-slate-400 block font-sans text-center mt-1 leading-snug">
-                              内置您的 API Token 与接口 URL，在 iPhone 导入后即可直接零配置一键运行！
+                              💡 <strong>小提示</strong>：直接下载的本地文件属于“未签名快捷指令”。Mac 电脑双击可直接免配导入运行。如果是 iOS 15+ 的 iPhone，直接双击可能会提示“未签名/不受信任无法打开”，此时更推荐您将原始指令分享生成官方 <strong>iCloud 链接</strong>，并配合第 2 步的 <strong>Token 复制</strong> 进行无报错快捷导入！
                             </span>
                           </div>
                         </div>
