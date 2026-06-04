@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   SleepRecord,
   MealItem,
@@ -133,6 +133,8 @@ export default function App() {
   // Syncing simulation state
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
+  const skipAutoUpload = useRef(false);
+  const isInitialMount = useRef(true);
 
   // Worker and AI states
   const [workerApiUrl, setWorkerApiUrl] = useState(() => localStorage.getItem("min_worker_api_url") || "https://zilv.alunapi.top");
@@ -294,6 +296,9 @@ export default function App() {
     if (session.isLoggedIn && workerApiUrl) {
       handleFetchWagerStatus();
       handleFetchWagerInvites();
+      
+      // 每次进入页面/登录状态建立时，默认静默同步加载云端最新打卡印记
+      handleCloudSync(true);
 
       const interval = setInterval(() => {
         handleFetchWagerStatus();
@@ -485,6 +490,52 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("min_user_session", JSON.stringify(session));
   }, [session]);
+
+  // 自动同步打卡数据到云端（已登录且有网络时静默进行）
+  useEffect(() => {
+    // 避免在刚加载组件时，由于本地 state 还没得到云端合并就发起覆盖上传
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    if (skipAutoUpload.current) {
+      return;
+    }
+
+    if (!session.isLoggedIn || !workerApiUrl) return;
+
+    const token = localStorage.getItem("min_cf_token");
+    if (!token) return;
+
+    // 延迟 800ms 进行静默上传（Debounce 减震，避免高频操作触发多次上传）
+    const delayDebounce = setTimeout(async () => {
+      try {
+        const minBackup = {
+          sleepRecords,
+          mealItems,
+          workoutRecords,
+          studyRecords,
+          mustDoTasks,
+          waterRecords,
+        };
+        
+        await fetch(`${workerApiUrl.replace(/\/$/, "")}/api/sync/upload`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(minBackup)
+        });
+        console.log("云端打卡流水自动静默上传备份成功");
+      } catch (err) {
+        console.error("云端打卡流水自动静默上传备份失败:", err);
+      }
+    }, 800);
+
+    return () => clearTimeout(delayDebounce);
+  }, [sleepRecords, mealItems, workoutRecords, studyRecords, mustDoTasks, waterRecords]);
 
   // Adjust input elements automatically if session refreshes
   useEffect(() => {
@@ -958,11 +1009,13 @@ export default function App() {
   };
 
   // Sync animation simulation
-  const handleCloudSync = async () => {
+  const handleCloudSync = async (silent = false) => {
     const workerUrl = workerApiUrl || "https://zilv.alunapi.top";
     
-    setIsSyncing(true);
-    setSyncStatus("正在合流云端自律行囊...");
+    if (!silent) {
+      setIsSyncing(true);
+      setSyncStatus("正在合流云端自律行囊...");
+    }
     
     try {
       const minBackup = {
@@ -999,21 +1052,35 @@ export default function App() {
       
       if (downloadResp.ok) {
         const cloudData = await downloadResp.json();
+        
+        // 标记为跳过，防止更新 State 触发多余的重复上传
+        skipAutoUpload.current = true;
+        
         if (cloudData.sleepRecords) setSleepRecords(cloudData.sleepRecords);
         if (cloudData.mealItems) setMealItems(cloudData.mealItems);
         if (cloudData.workoutRecords) setWorkoutRecords(cloudData.workoutRecords);
         if (cloudData.studyRecords) setStudyRecords(cloudData.studyRecords);
         if (cloudData.mustDoTasks) setMustDoTasks(cloudData.mustDoTasks);
         if (cloudData.waterRecords) setWaterRecords(cloudData.waterRecords);
+        
+        setTimeout(() => {
+          skipAutoUpload.current = false;
+        }, 150);
       }
       
-      setSyncStatus("🌟 同步合流成功！已拉取最新云端打卡印记并本地合并。");
+      if (!silent) {
+        setSyncStatus("🌟 同步合流成功！已拉取最新云端打卡印记并本地合并。");
+      }
     } catch (err: any) {
       console.error(err);
-      setSyncStatus(`❌ 同步失败: ${err.message || "无法连接云端"}`);
+      if (!silent) {
+        setSyncStatus(`❌ 同步失败: ${err.message || "无法连接云端"}`);
+      }
     } finally {
-      setIsSyncing(false);
-      setTimeout(() => setSyncStatus(null), 3500);
+      if (!silent) {
+        setIsSyncing(false);
+        setTimeout(() => setSyncStatus(null), 3500);
+      }
     }
   };
 

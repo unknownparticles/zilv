@@ -518,14 +518,16 @@ export default {
             const meals = data.mealItems || [];
             const workouts = data.workoutRecords || [];
             const studies = data.studyRecords || [];
+            const waters = data.waterRecords || [];
             
             // Check if any check-in exists on this specific date
             const hasSleep = sleeps.some((s: any) => s.date === date);
             const hasMeal = meals.some((m: any) => m.date === date);
             const hasWorkout = workouts.some((w: any) => w.date === date);
             const hasStudy = studies.some((st: any) => st.date === date);
+            const hasWater = waters.some((wa: any) => wa.date === date);
             
-            return hasSleep || hasMeal || hasWorkout || hasStudy;
+            return hasSleep || hasMeal || hasWorkout || hasStudy || hasWater;
           };
 
           const dailyPenalty = binding.depositTotal / binding.totalDays;
@@ -608,7 +610,12 @@ export default {
           const meals = data.mealItems || [];
           const workouts = data.workoutRecords || [];
           const studies = data.studyRecords || [];
-          return sleeps.some((s: any) => s.date === date) || meals.some((m: any) => m.date === date) || workouts.some((w: any) => w.date === date) || studies.some((st: any) => st.date === date);
+          const waters = data.waterRecords || [];
+          return sleeps.some((s: any) => s.date === date) || 
+                 meals.some((m: any) => m.date === date) || 
+                 workouts.some((w: any) => w.date === date) || 
+                 studies.some((st: any) => st.date === date) ||
+                 waters.some((wa: any) => wa.date === date);
         };
 
         const todayCheckedInA = checkUserCheckedIn(uAData, todayStr);
