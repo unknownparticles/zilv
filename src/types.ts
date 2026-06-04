@@ -159,4 +159,11 @@ export interface WagerInvite {
   createdAt: string;
 }
 
+export interface WaterRecord {
+  id: string;
+  date: string; // YYYY-MM-DD
+  time: string; // "14:30"
+  amount: number; // ml
+}
+
 

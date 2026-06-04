@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Moon, Utensils, Dumbbell, BookOpen, Clock, Camera, Loader2, Check, X, Star } from "lucide-react";
+import { Moon, Utensils, Dumbbell, BookOpen, Clock, Camera, Loader2, Check, X, Star, Droplet } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 interface CheckInModalProps {
@@ -10,6 +10,7 @@ interface CheckInModalProps {
   onAddDiet: (record: { period: string; text: string; note: string }) => void;
   onAddWorkout: (record: { type: string; duration: number }) => void;
   onAddStudy: (record: { content: string; duration: number }) => void;
+  onAddWater: (record: { amount: number }) => void;
   isAnalyzingImage: boolean;
   setIsAnalyzingImage: (val: boolean) => void;
 }
@@ -22,10 +23,11 @@ export default function CheckInModal({
   onAddDiet,
   onAddWorkout,
   onAddStudy,
+  onAddWater,
   isAnalyzingImage,
   setIsAnalyzingImage,
 }: CheckInModalProps) {
-  const [activeCheckTab, setActiveCheckTab] = useState<"sleep" | "diet" | "workout" | "study">("sleep");
+  const [activeCheckTab, setActiveCheckTab] = useState<"sleep" | "diet" | "workout" | "study" | "water">("sleep");
 
   // Sleep fields
   const [sleepTime, setSleepTime] = useState("23:00");
@@ -52,18 +54,21 @@ export default function CheckInModal({
   const [studyContent, setStudyContent] = useState("");
   const [studyDuration, setStudyDuration] = useState<number | "">("");
 
+  // Water fields
+  const [waterAmount, setWaterAmount] = useState<number>(250);
+
   const [errorText, setErrorText] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
   // Process camera photo & call Gemini API
   const resizeAndBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target?.result as string;
-        img.onload = () => {
+      // 优先使用 URL.createObjectURL，免去 Base64 阶段的超大内存占用，提高 iOS 的成功率
+      const objectUrl = URL.createObjectURL(file);
+      const img = new Image();
+      img.src = objectUrl;
+      img.onload = () => {
+        try {
           const canvas = document.createElement("canvas");
           const MAX_WIDTH = 256;
           const MAX_HEIGHT = 256;
@@ -86,11 +91,18 @@ export default function CheckInModal({
           canvas.height = height;
           const ctx = canvas.getContext("2d");
           ctx?.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL("image/jpeg", 0.5));
-        };
-        img.onerror = reject;
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.5);
+          URL.revokeObjectURL(objectUrl);
+          resolve(dataUrl);
+        } catch (e) {
+          URL.revokeObjectURL(objectUrl);
+          reject(e);
+        }
       };
-      reader.onerror = reject;
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error("图片解析失败！可能是 Live Photo 或苹果 HEIC 格式不兼容。建议将其截屏后重新上传。"));
+      };
     });
   };
 
@@ -129,7 +141,14 @@ export default function CheckInModal({
       });
 
       if (!response.ok) {
-        throw new Error("AI 无法识别当前图片，请确保格式正确");
+        let errMsg = "AI 无法识别当前图片，请确保格式正确";
+        try {
+          const errText = await response.text();
+          if (errText) {
+            errMsg = `识别失败: ${errText}`;
+          }
+        } catch (_) {}
+        throw new Error(errMsg);
       }
 
       const data = await response.json();
@@ -147,6 +166,8 @@ export default function CheckInModal({
       setErrorText(err.message || "无法连接智能识别，请直接键入食物细节。");
     } finally {
       setIsAnalyzingImage(false);
+      // 清空 input 里的值，确保重复上传同一张图片时也能触发 onChange
+      e.target.value = "";
     }
   };
 
@@ -200,6 +221,12 @@ export default function CheckInModal({
     setStudyDuration("");
   };
 
+  const handleWaterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onAddWater({ amount: waterAmount });
+    triggerSuccess(`补水打卡成功！摄入水份 ${waterAmount} ml 💧`);
+  };
+
   const triggerSuccess = (msg: string) => {
     setSuccessMsg(msg);
     setTimeout(() => {
@@ -229,7 +256,7 @@ export default function CheckInModal({
         </div>
 
         {/* Tab Selection */}
-        <div className="grid grid-cols-4 border-b border-slate-100 bg-white p-1 gap-1 select-none text-center">
+        <div className="grid grid-cols-5 border-b border-slate-100 bg-white p-1 gap-1 select-none text-center">
           <button
             onClick={() => { setActiveCheckTab("sleep"); setErrorText(""); }}
             className={`py-2 text-[11px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
@@ -268,6 +295,16 @@ export default function CheckInModal({
           >
             <BookOpen size={14} />
             <span>学习打卡</span>
+          </button>
+
+          <button
+            onClick={() => { setActiveCheckTab("water"); setErrorText(""); }}
+            className={`py-2 text-[11px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
+              activeCheckTab === "water" ? "bg-slate-900 text-white font-bold" : "text-slate-500 hover:bg-slate-100"
+            }`}
+          >
+            <Droplet size={14} />
+            <span>喝水打卡</span>
           </button>
         </div>
 
@@ -403,13 +440,19 @@ export default function CheckInModal({
                       
                       <input
                         type="file"
-                        accept="image/*"
-                        capture="environment"
+                        accept="image/jpeg, image/png, image/jpg"
                         onChange={handleDietPhotoUpload}
                         disabled={isAnalyzingImage}
                         className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                       />
                     </div>
+
+                    {errorText && (
+                      <div className="p-2.5 bg-rose-50 border border-rose-100 rounded-lg text-[10px] text-rose-600 font-semibold flex items-start gap-1 select-none">
+                        <span className="shrink-0 mt-0.5">⚠️</span>
+                        <span>{errorText}</span>
+                      </div>
+                    )}
 
                     {apiSuccessInfo && (
                       <div className="p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg text-[10.5px] text-emerald-800 flex items-center gap-1">
@@ -554,6 +597,57 @@ export default function CheckInModal({
                       className="w-full bg-slate-900 hover:bg-slate-950 text-white font-bold py-2.5 rounded-lg text-xs tracking-wide transition-all shadow cursor-pointer active:scale-[0.99]"
                     >
                       提交今日学习打卡
+                    </button>
+                  </form>
+                )}
+
+                {/* 5. Water Form */}
+                {activeCheckTab === "water" && (
+                  <form onSubmit={handleWaterSubmit} className="space-y-5">
+                    <div className="space-y-1">
+                      <label className="text-[11px] text-slate-500 font-bold block mb-1.5">本次补水摄入量 (毫升) <span className="text-rose-500">*</span></label>
+                      
+                      {/* Presets Grid */}
+                      <div className="grid grid-cols-3 gap-2.5 mb-4">
+                        {[150, 250, 350, 500, 750, 1000].map(amount => (
+                          <button
+                            key={amount}
+                            type="button"
+                            onClick={() => setWaterAmount(amount)}
+                            className={`py-3.5 rounded-xl border text-xs font-black transition-all cursor-pointer ${
+                              waterAmount === amount 
+                                ? "bg-slate-900 border-slate-900 text-white shadow-md scale-102" 
+                                : "bg-slate-50 border-slate-205 text-slate-700 hover:bg-slate-100"
+                            }`}
+                          >
+                            🥤 {amount} ml
+                            {amount === 250 && <span className="text-[8px] font-bold block text-inherit opacity-80">(推荐一杯)</span>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Custom Input */}
+                      <div className="relative">
+                        <input
+                          type="number"
+                          required
+                          min={10}
+                          max={3000}
+                          placeholder="自定义水量"
+                          value={waterAmount}
+                          onChange={(e) => setWaterAmount(Number(e.target.value))}
+                          className="w-full text-xs border border-slate-205 rounded-xl p-2.5 pr-10 focus:outline-none"
+                        />
+                        <span className="absolute right-3.5 top-2.5 text-xs text-slate-400 font-bold select-none">ml</span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="w-full bg-slate-900 hover:bg-slate-950 text-white font-bold py-2.5 rounded-lg text-xs tracking-wide transition-all shadow cursor-pointer active:scale-[0.99] flex items-center justify-center gap-1.5"
+                    >
+                      <Droplet size={12} className="animate-pulse" />
+                      <span>确认补水打卡</span>
                     </button>
                   </form>
                 )}

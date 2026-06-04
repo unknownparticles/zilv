@@ -8,6 +8,7 @@ import {
   UserSession,
   WagerBinding,
   WagerInvite,
+  WaterRecord,
 } from "./types";
 import CheckInModal from "./components/CheckInModal";
 import {
@@ -77,6 +78,11 @@ export default function App() {
 
   const [studyRecords, setStudyRecords] = useState<StudyRecord[]>(() => {
     const raw = localStorage.getItem("min_study_records");
+    return raw ? JSON.parse(raw) : [];
+  });
+
+  const [waterRecords, setWaterRecords] = useState<WaterRecord[]>(() => {
+    const raw = localStorage.getItem("min_water_records");
     return raw ? JSON.parse(raw) : [];
   });
 
@@ -306,7 +312,7 @@ export default function App() {
     if (session.isLoggedIn && workerApiUrl) {
       handleFetchWagerStatus();
     }
-  }, [sleepRecords, mealItems, workoutRecords, studyRecords]);
+  }, [sleepRecords, mealItems, workoutRecords, studyRecords, waterRecords]);
 
   // Sync AI suggestions to localStorage
   useEffect(() => {
@@ -467,6 +473,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("min_study_records", JSON.stringify(studyRecords));
   }, [studyRecords]);
+
+  useEffect(() => {
+    localStorage.setItem("min_water_records", JSON.stringify(waterRecords));
+  }, [waterRecords]);
 
   useEffect(() => {
     localStorage.setItem("min_must_do_tasks", JSON.stringify(mustDoTasks));
@@ -670,6 +680,7 @@ export default function App() {
               if (cloudData.workoutRecords) setWorkoutRecords(cloudData.workoutRecords);
               if (cloudData.studyRecords) setStudyRecords(cloudData.studyRecords);
               if (cloudData.mustDoTasks) setMustDoTasks(cloudData.mustDoTasks);
+              if (cloudData.waterRecords) setWaterRecords(cloudData.waterRecords);
             }
           } catch (syncErr) {
             console.error("同步失败:", syncErr);
@@ -870,6 +881,7 @@ export default function App() {
         workoutRecords,
         studyRecords,
         mustDoTasks,
+        waterRecords,
       };
       fetch(`${workerApiUrl.replace(/\/$/, "")}/api/sync/upload`, {
         method: "POST",
@@ -897,6 +909,7 @@ export default function App() {
         workoutRecords,
         studyRecords,
         mustDoTasks,
+        waterRecords,
       }
     };
     const blob = new Blob([JSON.stringify(minBackup, null, 2)], { type: "application/json" });
@@ -922,6 +935,7 @@ export default function App() {
           if (parsed.data.workoutRecords) setWorkoutRecords(parsed.data.workoutRecords);
           if (parsed.data.studyRecords) setStudyRecords(parsed.data.studyRecords);
           if (parsed.data.mustDoTasks) setMustDoTasks(parsed.data.mustDoTasks);
+          if (parsed.data.waterRecords) setWaterRecords(parsed.data.waterRecords);
           if (parsed.user) {
             setSession({
               ...parsed.user,
@@ -953,6 +967,7 @@ export default function App() {
         workoutRecords,
         studyRecords,
         mustDoTasks,
+        waterRecords,
       };
       
       const token = localStorage.getItem("min_cf_token") || "";
@@ -985,6 +1000,7 @@ export default function App() {
         if (cloudData.workoutRecords) setWorkoutRecords(cloudData.workoutRecords);
         if (cloudData.studyRecords) setStudyRecords(cloudData.studyRecords);
         if (cloudData.mustDoTasks) setMustDoTasks(cloudData.mustDoTasks);
+        if (cloudData.waterRecords) setWaterRecords(cloudData.waterRecords);
       }
       
       setSyncStatus("🌟 同步合流成功！已拉取最新云端打卡印记并本地合并。");
@@ -1004,13 +1020,15 @@ export default function App() {
     const meals = mealItems.filter((m) => m.date === todayStr);
     const workouts = workoutRecords.filter((w) => w.date === todayStr);
     const studies = studyRecords.filter((st) => st.date === todayStr);
+    const waters = waterRecords.filter((w) => w.date === todayStr);
 
     return {
       sleeps,
       meals,
       workouts,
       studies,
-      totalCount: sleeps.length + meals.length + workouts.length + studies.length,
+      waters,
+      totalCount: sleeps.length + meals.length + workouts.length + studies.length + waters.length,
     };
   };
 
