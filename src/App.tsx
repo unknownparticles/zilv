@@ -10,6 +10,10 @@ import {
   WagerInvite,
   WaterRecord,
   WeightRecord,
+  DietAdvice,
+  WorkoutPlan,
+  SkillChallenge,
+  LearningPath,
 } from "./types";
 import CheckInModal from "./components/CheckInModal";
 import {
@@ -1325,12 +1329,12 @@ export default function App() {
       
       {/* 1. STANDALONE LOGIN/REGISTER PAGE */}
       {!session.isLoggedIn ? (
-        <div className="flex-1 flex items-center justify-center p-4 min-h-screen bg-slate-100 select-none">
-          <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl shadow-xl overflow-hidden p-8 space-y-6">
+        <div className="flex-1 flex items-center justify-center p-4 min-h-screen bg-slate-50 select-none">
+          <div className="w-full max-w-md bg-white border border-slate-100 rounded-3xl shadow-lg overflow-hidden p-8 space-y-6">
             
             {/* Header info */}
             <div className="text-center space-y-2">
-              <div className="mx-auto h-12 w-12 rounded-2xl bg-slate-950 text-emerald-400 flex items-center justify-center text-2xl font-black shadow-md">
+              <div className="mx-auto h-12 w-12 rounded-2xl bg-indigo-650 text-white flex items-center justify-center text-2xl font-black shadow-sm">
                 🏆
               </div>
               <div>
@@ -1340,12 +1344,12 @@ export default function App() {
             </div>
 
             {/* Cloud Config Accordion */}
-            <div className="border border-slate-200 rounded-2xl p-3 bg-slate-50/50 space-y-2 text-left">
+            <div className="border border-slate-100 rounded-2xl p-4 bg-slate-50/50 space-y-2 text-left">
               <div className="flex items-center justify-between">
-                <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1">
+                <label className="text-xs text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1">
                   <span>☁️ Cloudflare Worker 服务接口</span>
                 </label>
-                <span className="text-[9px] text-emerald-650 font-extrabold bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">
+                <span className="text-xs text-emerald-700 font-extrabold bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">
                   {workerApiUrl ? "云端模式" : "单机模式"}
                 </span>
               </div>
@@ -1358,15 +1362,15 @@ export default function App() {
                   setWorkerApiUrl(val);
                   localStorage.setItem("min_worker_api_url", val.trim());
                 }}
-                className="w-full text-[11px] border border-slate-200 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-slate-500 bg-white font-mono"
+                className="w-full text-sm border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-1 focus:ring-slate-300 bg-white font-mono"
               />
-              <p className="text-[8.5px] text-slate-400">若配置了云端接口，注册登录与打卡同步均自动走云端 KV 验证。</p>
+              <p className="text-xs text-slate-405 leading-normal">若配置了云端接口，注册登录与打卡同步均自动走云端 KV 验证。</p>
             </div>
 
             {/* Form */}
             <form onSubmit={handleAuthSubmit} className="space-y-4 text-left">
               <div className="space-y-1">
-                <label className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">
+                <label className="text-xs text-slate-500 font-bold uppercase tracking-wider">
                   账号登录名 <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -1378,13 +1382,13 @@ export default function App() {
                   autoCapitalize="none"
                   autoCorrect="off"
                   spellCheck="false"
-                  className="w-full text-xs border border-slate-205 rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-slate-500 bg-slate-50 font-medium text-slate-800"
+                  className="w-full text-sm border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-slate-300 bg-slate-50 font-medium text-slate-800"
                 />
               </div>
 
               {!isLoginView && (
                 <div className="space-y-1">
-                  <label className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">
+                  <label className="text-xs text-slate-500 font-bold uppercase tracking-wider">
                     自律修行昵称
                   </label>
                   <input
@@ -1392,13 +1396,13 @@ export default function App() {
                     placeholder="例如: 每日拉伸星人"
                     value={authNickname}
                     onChange={(e) => setAuthNickname(e.target.value)}
-                    className="w-full text-xs border border-slate-205 rounded-xl p-3 focus:outline-none bg-slate-50 font-medium text-slate-800"
+                    className="w-full text-sm border border-slate-200 rounded-xl p-3 focus:outline-none bg-slate-50 font-medium text-slate-800"
                   />
                 </div>
               )}
 
               <div className="space-y-1">
-                <label className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">
+                <label className="text-xs text-slate-500 font-bold uppercase tracking-wider">
                   密码 <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -1407,13 +1411,13 @@ export default function App() {
                   placeholder="请输入访问密码"
                   value={authPassword}
                   onChange={(e) => setAuthPassword(e.target.value)}
-                  className="w-full text-xs border border-slate-205 rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-slate-500 bg-slate-50 font-semibold"
+                  className="w-full text-sm border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-slate-300 bg-slate-50 font-semibold"
                 />
               </div>
 
               {!isLoginView && workerApiUrl && (
                 <div className="space-y-1">
-                  <label className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">
+                  <label className="text-xs text-slate-500 font-bold uppercase tracking-wider">
                     激活邀请码 <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -1422,31 +1426,31 @@ export default function App() {
                     placeholder="请输入专属注册激活邀请码"
                     value={authInviteCode}
                     onChange={(e) => setAuthInviteCode(e.target.value)}
-                    className="w-full text-xs border border-slate-205 rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-slate-500 bg-slate-50 font-bold text-slate-800"
+                    className="w-full text-xs border border-slate-200 rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-slate-500 bg-slate-50 font-bold text-slate-800"
                   />
                 </div>
               )}
 
               {authError && (
-                <p className="text-[10px] text-rose-500 font-bold text-center bg-rose-50 p-2 rounded-lg leading-relaxed">
+                <p className="text-xs text-rose-500 font-bold text-center bg-rose-50 p-2 rounded-lg leading-relaxed">
                   {authError}
                 </p>
               )}
               {authSuccess && (
-                <p className="text-[10.5px] text-emerald-800 bg-emerald-50 border border-emerald-100 p-2.5 rounded-xl font-bold text-center">
+                <p className="text-xs text-emerald-800 bg-emerald-50 border border-emerald-100 p-2.5 rounded-xl font-bold text-center">
                   {authSuccess}
                 </p>
               )}
 
               <button
                 type="submit"
-                className="w-full bg-slate-900 hover:bg-slate-950 text-white font-black py-3 rounded-xl tracking-wider text-xs transition-transform active:scale-99 cursor-pointer shadow-md"
+                className="w-full bg-indigo-605 hover:bg-indigo-700 text-white font-black py-3 rounded-xl tracking-wider text-xs transition-transform active:scale-99 cursor-pointer shadow-md"
               >
                 {isLoginView ? "立刻登录" : "立即注册"}
               </button>
             </form>
 
-            <div className="border-t border-slate-100 pt-4 flex flex-col items-center justify-between text-[11px] text-slate-500 space-y-2">
+            <div className="border-t border-slate-100 pt-4 flex flex-col items-center justify-between text-xs text-slate-500 space-y-2">
               <button
                 type="button"
                 onClick={() => {
@@ -1469,23 +1473,23 @@ export default function App() {
         /* 2. LOGGED-IN MAIN TAB INTERFACE */
         <>
           {/* Main Top Header */}
-          <header className="sticky top-0 z-40 bg-white border-b border-slate-200 px-4 py-3 shadow-xs shrink-0 select-none">
+          <header className="sticky top-0 z-40 bg-white border-b border-slate-100 px-4 py-3 shadow-sm shrink-0 select-none">
             <div className="max-w-4xl mx-auto flex items-center justify-between">
               
               <div className="flex items-center gap-2.5">
                 <img
                   src={session.avatarUrl}
                   alt="Profile"
-                  className="h-9 w-9 rounded-full object-cover border-2 border-slate-800"
+                  className="h-9 w-9 rounded-full object-cover border border-slate-200"
                 />
                 <div>
-                  <h1 className="text-xs font-black tracking-tight text-slate-900 flex items-center gap-1.5 leading-none">
+                  <h1 className="text-sm font-bold tracking-tight text-slate-900 flex items-center gap-1.5 leading-none">
                     <span>{session.name} 的修行旅程</span>
-                    <span className="text-[8px] bg-emerald-50 text-emerald-700 border border-emerald-100 font-extrabold px-1.5 py-0.5 rounded-full uppercase scale-95 select-none">
+                    <span className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-100 font-extrabold px-1.5 py-0.5 rounded-full uppercase scale-95 select-none">
                       已登
                     </span>
                   </h1>
-                  <span className="text-[9.5px] text-slate-400 font-bold font-mono">
+                  <span className="text-xs text-slate-400 font-bold font-mono">
                     ID: {session.id}
                   </span>
                 </div>
@@ -1493,7 +1497,7 @@ export default function App() {
 
               {/* Quotes */}
               <div className="hidden md:block max-w-sm">
-                <p className="text-[10px] text-slate-400 italic text-right truncate">
+                <p className="text-xs text-slate-400 italic text-right truncate">
                   “ {motto} ”
                 </p>
               </div>
@@ -1508,7 +1512,7 @@ export default function App() {
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="p-2 text-rose-500 hover:bg-rose-50 rounded-xl cursor-pointer flex items-center gap-1 text-[11px] font-bold"
+                  className="p-2 text-rose-500 hover:bg-rose-50 rounded-xl cursor-pointer flex items-center gap-1 text-xs font-bold"
                   title="退出登录"
                 >
                   <LogOut size={14} />
@@ -1537,121 +1541,74 @@ export default function App() {
                   >
                     
                     {/* 1. SINGLE LINE SCROLLING DEED TICKER */}
-                    <div className="bg-slate-900 text-slate-205 border border-slate-850 rounded-2xl p-2 px-3 shadow-md flex items-center gap-2.5 overflow-hidden select-none relative h-9 shrink-0">
-                      <div className="flex items-center gap-1.5 font-black text-[10px] text-emerald-400 shrink-0 tracking-wider">
-                        <ListTodo size={11} className="stroke-[3]" />
-                        <span>必做誓愿</span>
-                      </div>
-                      <div className="h-3 w-[1px] bg-slate-800 shrink-0" />
-                      <div className="flex-1 overflow-hidden relative h-full flex items-center text-[11px]">
-                        {/* Inline CSS style for infinite marquee */}
-                        <style>{`
-                          @keyframes marquee_loop {
-                            0% { transform: translateX(0); }
-                            100% { transform: translateX(-50%); }
-                          }
-                          .marquee-content {
-                            display: flex;
-                            align-items: center;
-                            gap: 2.5rem;
-                            animation: marquee_loop 28s linear infinite;
-                            white-space: nowrap;
-                          }
-                          .marquee-content:hover {
-                            animation-play-state: paused;
-                          }
-                        `}</style>
-                        <div className="marquee-content">
-                          {mustDoTasks.filter(t => !t.completed).length === 0 ? (
-                            <>
-                              <span className="text-slate-400 font-medium">✨ 今日已万虑皆清！点击下方“一键打卡”按钮记录最新修行足迹吧 ~</span>
-                              <span className="text-slate-400 font-medium">✨ 今日已万虑皆清！点击下方“一键打卡”按钮记录最新修行足迹吧 ~</span>
-                            </>
-                          ) : (
-                            (() => {
-                              const list = mustDoTasks.filter(t => !t.completed);
-                              const tickerString = list.map(t => `✦ [${t.period === "today" ? "今日" : t.period === "week" ? "每周" : "每月"}] ${t.text} (${t.time || "⏰ 全天"})`).join("      |      ");
-                              return (
-                                <>
-                                  <span className="font-semibold tracking-normal text-emerald-300">{tickerString}</span>
-                                  <span className="font-semibold tracking-normal text-emerald-300">{tickerString}</span>
-                                </>
-                              );
-                            })()
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 1.5. 🔥 狂热火花对赌对战卡片 */}
-                    <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-900/40 rounded-3xl p-6 shadow-xl relative overflow-hidden text-white">
-                      {/* 背景星光粒子装饰 */}
-                      <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-                      <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+                     <div className="bg-gradient-to-br from-indigo-50/40 via-white to-sky-50/30 border border-slate-200/80 rounded-3xl p-6 shadow-sm relative overflow-hidden text-slate-800">
+                      {/* 背景轻微装饰 */}
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-100/20 rounded-full blur-3xl pointer-events-none" />
+                      <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-emerald-100/20 rounded-full blur-3xl pointer-events-none" />
                       
-                      <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-5 relative z-10">
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5 relative z-10">
                         <div className="flex items-center gap-2">
                           <span className="text-2xl animate-pulse">🔥</span>
                           <div>
-                            <h3 className="text-sm font-black tracking-tight text-white flex items-center gap-1.5">
+                            <h3 className="text-sm font-black tracking-tight text-slate-900 flex items-center gap-1.5">
                               自律火花对赌对战
                             </h3>
-                            <p className="text-[10px] text-indigo-200 font-medium">与好友相互绑定，用保证金和魔鬼难度鞭策彼此成长</p>
+                            <p className="text-xs text-slate-500 font-medium">与好友相互绑定，用保证金和魔鬼难度鞭策彼此成长</p>
                           </div>
                         </div>
                         {wagerLoading && (
-                          <RefreshCw className="animate-spin text-indigo-400" size={16} />
+                          <RefreshCw className="animate-spin text-indigo-600" size={16} />
                         )}
                       </div>
 
                       {wagerError && (
-                        <div className="mb-4 p-3 bg-rose-500/20 border border-rose-500/30 rounded-xl text-xs text-rose-200 font-semibold">
+                        <div className="mb-4 p-3 bg-rose-50 border border-rose-100 rounded-xl text-xs text-rose-800 font-semibold">
                           ⚠️ {wagerError}
                         </div>
                       )}
 
                       {!session.isLoggedIn ? (
                         <div className="text-center py-6 relative z-10">
-                          <p className="text-xs text-slate-300 font-medium mb-3">您当前处于离线游客状态。请先去“修行阁”登录，即可体验云端对赌绑定功能！</p>
+                          <p className="text-xs text-slate-500 font-medium mb-3">您当前处于离线游客状态。请先去“修行阁”登录，即可体验云端对赌绑定功能！</p>
                         </div>
                       ) : !bindingInfo ? (
                         // ================= 未绑定对赌状态 =================
                         <div className="space-y-6 relative z-10">
                           {/* 1. 发送邀请 Form */}
                           <form onSubmit={handleSendWagerInvite} className="space-y-4">
-                            <h4 className="text-xs font-black text-indigo-300 flex items-center gap-1">
+                            <h4 className="text-xs font-black text-indigo-650 flex items-center gap-1">
                               <span>✉️ 发起新的对赌誓愿邀请</span>
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               <div>
-                                <label className="block text-[10px] text-slate-400 font-bold mb-1">对方用户名 (注册账号)</label>
+                                <label className="block text-xs text-slate-500 font-bold mb-1">对方用户名 (注册账号)</label>
                                 <input
                                   type="text"
                                   placeholder="请输入好友的用户名"
                                   value={inviteFriendUsername}
                                   onChange={(e) => setInviteFriendUsername(e.target.value)}
-                                  className="w-full bg-slate-800/80 border border-slate-700/50 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                                 />
                               </div>
                               <div>
-                                <label className="block text-[10px] text-slate-400 font-bold mb-1">对赌誓愿目标</label>
+                                <label className="block text-xs text-slate-500 font-bold mb-1">对赌誓愿目标</label>
                                 <input
                                   type="text"
                                   placeholder="例如：每天7点前起床、每天记单词"
                                   value={inviteWagerTarget}
                                   onChange={(e) => setInviteWagerTarget(e.target.value)}
-                                  className="w-full bg-slate-800/80 border border-slate-700/50 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                                 />
                               </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               <div>
-                                <label className="block text-[10px] text-slate-400 font-bold mb-1">对赌期限</label>
+                                <label className="block text-xs text-slate-500 font-bold mb-1">对赌期限</label>
                                 <select
                                   value={inviteWagerDuration}
                                   onChange={(e) => setInviteWagerDuration(e.target.value)}
-                                  className="w-full bg-slate-800/80 border border-slate-700/50 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                                 >
                                   <option value="week">一周挑战 (7天)</option>
                                   <option value="month">一个月挑战 (30天)</option>
@@ -1660,11 +1617,11 @@ export default function App() {
                                 </select>
                               </div>
                               <div>
-                                <label className="block text-[10px] text-slate-400 font-bold mb-1">保证金金额</label>
+                                <label className="block text-xs text-slate-500 font-bold mb-1">保证金金额</label>
                                 <select
                                   value={inviteWagerDeposit}
                                   onChange={(e) => setInviteWagerDeposit(e.target.value)}
-                                  className="w-full bg-slate-800/80 border border-slate-700/50 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                                 >
                                   <option value="10">¥10.00</option>
                                   <option value="20">¥20.00</option>
@@ -1678,7 +1635,7 @@ export default function App() {
                             <button
                               type="submit"
                               disabled={wagerLoading}
-                              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-800 text-white font-black text-xs py-2.5 rounded-xl transition-all active:scale-98 shadow-lg shadow-indigo-900/30 cursor-pointer"
+                              className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white font-bold text-xs py-2.5 rounded-xl transition-all active:scale-98 shadow-sm cursor-pointer"
                             >
                               {wagerLoading ? "正在寄送信鸽..." : "🔥 寄出对赌挑战书"}
                             </button>
@@ -1686,34 +1643,34 @@ export default function App() {
 
                           {/* 2. 待处理的邀请 */}
                           {bondingInvites.length > 0 && (
-                            <div className="border-t border-white/10 pt-4 space-y-3">
-                              <h4 className="text-xs font-black text-emerald-400 flex items-center gap-1.5">
+                            <div className="border-t border-slate-100 pt-4 space-y-3">
+                              <h4 className="text-xs font-black text-emerald-700 flex items-center gap-1.5">
                                 <span>📥 收到的对赌绑定挑战信 ({bondingInvites.length})</span>
                               </h4>
                               <div className="space-y-2.5 max-h-48 overflow-y-auto pr-1">
                                 {bondingInvites.map((invite) => (
-                                  <div key={invite.id} className="bg-white/5 border border-white/10 p-3 rounded-xl flex items-center justify-between gap-4">
-                                    <div className="space-y-1">
-                                      <p className="text-xs font-bold text-white">
-                                        来自 <span className="text-indigo-300 font-extrabold">{invite.from}</span> 的誓约
+                                  <div key={invite.id} className="bg-slate-50 border border-slate-150 p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div className="space-y-1 min-w-0">
+                                      <p className="text-xs font-bold text-slate-800">
+                                        来自 <span className="text-indigo-600 font-extrabold">{invite.from}</span> 的誓约
                                       </p>
-                                      <p className="text-[11px] text-slate-300 font-medium">目标：{invite.target}</p>
-                                      <p className="text-[10px] text-slate-400 font-semibold">
-                                        期限：{invite.duration === "week" ? "1周" : invite.duration === "month" ? "1个月" : invite.duration === "halfYear" ? "半年" : "1年"} | 保证金：<span className="text-emerald-400 font-bold">¥{invite.deposit.toFixed(2)}</span>
+                                      <p className="text-xs text-slate-650 font-medium truncate">目标：{invite.target}</p>
+                                      <p className="text-xs text-slate-405 font-semibold">
+                                        期限：{invite.duration === "week" ? "1周" : invite.duration === "month" ? "1个月" : invite.duration === "halfYear" ? "半年" : "1年"} | 保证金：<span className="text-emerald-600 font-bold">¥{invite.deposit.toFixed(2)}</span>
                                       </p>
                                     </div>
                                     <div className="flex gap-2 shrink-0">
                                       <button
                                         onClick={() => handleAcceptWagerInvite(invite.id)}
                                         disabled={wagerLoading}
-                                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[10px] px-3 py-1.5 rounded-lg transition-all active:scale-95 cursor-pointer"
+                                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-3 py-1.5 rounded-lg transition-all active:scale-95 cursor-pointer"
                                       >
                                         迎战
                                       </button>
                                       <button
                                         onClick={() => handleRejectWagerInvite(invite.id)}
                                         disabled={wagerLoading}
-                                        className="bg-white/10 hover:bg-white/20 text-slate-300 font-extrabold text-[10px] px-3 py-1.5 rounded-lg transition-all active:scale-95 cursor-pointer"
+                                        className="bg-slate-200 hover:bg-slate-300/80 text-slate-700 font-extrabold text-xs px-3 py-1.5 rounded-lg transition-all active:scale-95 cursor-pointer"
                                       >
                                         婉拒
                                       </button>
@@ -1728,38 +1685,38 @@ export default function App() {
                         // ================= 已绑定对赌状态 =================
                         <div className="space-y-5 relative z-10">
                           {/* 对赌概览头 */}
-                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white/5 border border-white/10 p-3 rounded-xl">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-50 border border-slate-150 p-3 rounded-xl">
                             <div>
-                              <p className="text-xs text-slate-300">
+                               <p className="text-xs text-slate-650">
                                 对赌伙伴：
-                                <span className="font-extrabold text-white text-xs pl-1">
+                                <span className="font-extrabold text-slate-800 text-xs pl-1">
                                   {bindingInfo.userANickname} (我) 🤝 {bindingInfo.userBNickname} (好友)
                                 </span>
                               </p>
-                              <p className="text-[11px] text-slate-400 mt-0.5">
-                                誓愿目标：<span className="text-indigo-200 font-semibold">{bindingInfo.target}</span>
+                              <p className="text-xs text-slate-500 mt-0.5">
+                                誓愿目标：<span className="text-indigo-700 font-semibold">{bindingInfo.target}</span>
                               </p>
                             </div>
-                            <span className="text-[10px] bg-indigo-900/60 text-indigo-200 font-bold px-2 py-0.5 rounded border border-indigo-800">
+                            <span className="text-xs bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded border border-indigo-150">
                               期限：{bindingInfo.duration === "week" ? "1周" : bindingInfo.duration === "month" ? "1个月" : bindingInfo.duration === "halfYear" ? "半年" : "1年"} ({bindingInfo.totalDays}天)
                             </span>
                           </div>
 
                           {/* 火花与保证金醒目看板 */}
                           <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-gradient-to-br from-orange-500/10 to-rose-500/10 border border-orange-500/20 rounded-2xl p-4 text-center">
-                              <span className="text-[10px] text-orange-300 font-black tracking-wider uppercase block mb-1">🔥 狂热火花天数</span>
-                              <div className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-400 to-rose-500 tracking-tighter select-none py-1">
+                            <div className="bg-orange-50/50 border border-orange-100 rounded-2xl p-4 text-center">
+                              <span className="text-xs text-orange-700 font-black tracking-wider uppercase block mb-1">🔥 狂热火花天数</span>
+                              <div className="text-4xl sm:text-5xl font-black text-orange-600 tracking-tighter select-none py-1">
                                 {bindingInfo.streakDays}
-                                <span className="text-xs font-bold text-orange-300 ml-1">天</span>
+                                <span className="text-xs font-bold text-orange-600 ml-1">天</span>
                               </div>
                             </div>
 
-                            <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-2xl p-4 text-center">
-                              <span className="text-[10px] text-emerald-300 font-black tracking-wider uppercase block mb-1">💰 剩余保证金</span>
-                              <div className="text-2xl sm:text-3xl font-black text-emerald-400 tracking-tight py-2">
+                            <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4 text-center">
+                              <span className="text-xs text-emerald-700 font-black tracking-wider uppercase block mb-1">💰 剩余保证金</span>
+                              <div className="text-2xl sm:text-3xl font-black text-emerald-600 tracking-tight py-2">
                                 ¥{Number(bindingInfo.depositRemaining).toFixed(2)}
-                                <span className="text-[10px] font-bold text-slate-400 block sm:inline sm:ml-1">
+                                <span className="text-xs font-bold text-slate-500 block sm:inline sm:ml-1">
                                   / ¥{Number(bindingInfo.depositTotal).toFixed(2)}
                                 </span>
                               </div>
@@ -1767,24 +1724,35 @@ export default function App() {
                           </div>
 
                           {/* 打卡指示器 */}
-                          <div className="bg-white/5 border border-white/10 p-3.5 rounded-xl space-y-2.5">
-                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">今日打卡动态监控</p>
+                          <div className="bg-slate-50 border border-slate-150 p-3.5 rounded-xl space-y-2.5">
+                            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">今日打卡动态监控</p>
                             <div className="flex items-center justify-around">
                               <div className="flex items-center gap-2">
-                                <div className={`w-3 h-3 rounded-full ${bindingInfo.todayCheckedInA ? "bg-emerald-500 animate-pulse" : "bg-slate-600"}`} />
-                                <span className="text-xs font-bold">{bindingInfo.userANickname} (我)</span>
-                                <span className="text-[10px] text-slate-450 font-bold">
+                                <div className={`w-3 h-3 rounded-full ${bindingInfo.todayCheckedInA ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`} />
+                                <span className="text-xs font-bold text-slate-700">{bindingInfo.userANickname} (我)</span>
+                                <span className="text-xs text-slate-500 font-bold">
                                   ({bindingInfo.todayCheckedInA ? "已完成" : "未完成"})
                                 </span>
                               </div>
-                              <div className="w-[1px] h-6 bg-white/10" />
+                              <div className="w-[1px] h-6 bg-slate-200" />
                               <div className="flex items-center gap-2">
-                                <div className={`w-3 h-3 rounded-full ${bindingInfo.todayCheckedInB ? "bg-emerald-500 animate-pulse" : "bg-slate-600"}`} />
-                                <span className="text-xs font-bold">{bindingInfo.userBNickname}</span>
-                                <span className="text-[10px] text-slate-455 font-bold">
+                                <div className={`w-3 h-3 rounded-full ${bindingInfo.todayCheckedInB ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`} />
+                                <span className="text-xs font-bold text-slate-700">{bindingInfo.userBNickname}</span>
+                                <span className="text-xs text-slate-500 font-bold">
                                   ({bindingInfo.todayCheckedInB ? "已完成" : "未完成"})
                                 </span>
                               </div>
+                            </div>
+                          </div>
+
+                          {/* 狂�                    </div>                               }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>            </div>
                             </div>
                           </div>
 
@@ -1795,7 +1763,7 @@ export default function App() {
                                 <span className="text-lg">🚨</span>
                                 <div className="space-y-0.5">
                                   <h4 className="text-xs font-black text-rose-300">警报：火花熄灭，保证金正在流失！</h4>
-                                  <p className="text-[10.5px] text-slate-300 leading-relaxed">
+                                  <p className="text-xs text-slate-300 leading-relaxed">
                                     你们已经有 <span className="text-rose-400 font-black">{bindingInfo.missedDaysCount}</span> 天没有达成同频打卡了！今日已按天数比例扣除保证金。
                                     如果想要挽救，可以申请开启 <b>AI 狂暴魔鬼恢复挑战</b> —— 接下来 <b>{bindingInfo.missedDaysCount * 7} 天内全勤打卡</b>，通关后即可返还在此次中断期间所有被扣除的保证金！
                                   </p>
@@ -1819,7 +1787,7 @@ export default function App() {
                                   <h4 className="text-xs font-black text-amber-300 flex items-center gap-1.5 animate-pulse">
                                     <span>AI 狂暴自律挑战火热行进中！</span>
                                   </h4>
-                                  <p className="text-[10.5px] text-slate-300 leading-relaxed">
+                                  <p className="text-xs text-slate-300 leading-relaxed">
                                     当前 AI 任务难度已经<b>狂暴提升 1.2 倍</b>，字里行间化身严苛魔鬼教练！
                                     挑战目标天数：<b>{bindingInfo.rageModeTargetDays} 天全勤</b>，剩余 <b>{bindingInfo.rageModeRemainingDays} 天</b>。
                                     <span className="text-rose-300 font-semibold block mt-1">⚠️ 警示：任何一天未按时打卡，魔鬼挑战天数将再次被自动延长 7 天！</span>
@@ -1847,16 +1815,16 @@ export default function App() {
                         <div>
                           <h3 className="text-sm font-black text-slate-800 tracking-tight flex items-center gap-1.5">
                             <span>🏆 今日修行大底盘</span>
-                            <span className="text-[10px] bg-slate-900 text-emerald-450 font-bold px-2 py-0.5 rounded-full">DDC</span>
+                            <span className="text-xs bg-indigo-600 text-indigo-600 font-bold px-2 py-0.5 rounded-full">DDC</span>
                           </h3>
-                          <p className="text-[10px] text-slate-400 font-medium mt-0.5">合并常规打卡与今日誓愿，一步到位管理日常自律</p>
+                          <p className="text-xs text-slate-400 font-medium mt-0.5">合并常规打卡与今日誓愿，一步到位管理日常自律</p>
                         </div>
                         <button
                           onClick={() => {
                             setCheckInDefaultTab("sleep");
                             setIsCheckInOpen(true);
                           }}
-                          className="bg-slate-900 hover:bg-slate-950 text-white font-extrabold px-3 py-1.5 rounded-xl text-[10.5px] transition-all active:scale-95 cursor-pointer flex items-center gap-1 shadow-sm shrink-0"
+                          className="bg-indigo-605 hover:bg-indigo-700 text-white font-extrabold px-3 py-1.5 rounded-xl text-xs transition-all active:scale-95 cursor-pointer flex items-center gap-1 shadow-sm shrink-0"
                         >
                           <span>⚡ 快速打卡</span>
                         </button>
@@ -1865,10 +1833,10 @@ export default function App() {
                       {/* 1. Daily Discipline Metrics Grid */}
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-[10px] text-slate-400 font-black tracking-wider uppercase flex items-center gap-1">
+                          <h4 className="text-xs text-slate-400 font-black tracking-wider uppercase flex items-center gap-1">
                             <span>⚡ 常规修行指标打卡</span>
                           </h4>
-                          <span className="text-[9px] text-slate-400 font-semibold">点击指标卡片直接登记</span>
+                          <span className="text-xs text-slate-400 font-semibold">点击指标卡片直接登记</span>
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -1884,19 +1852,19 @@ export default function App() {
                                 }}
                                 className={`text-left p-3 rounded-2xl border transition-all duration-200 active:scale-97 cursor-pointer flex flex-col justify-between min-h-[76px] relative overflow-hidden group ${
                                   isDone
-                                    ? "bg-gradient-to-br from-indigo-900 to-blue-950 border-indigo-950 text-white shadow-sm hover:opacity-95"
-                                    : "bg-slate-50/50 border-slate-200 hover:bg-slate-50 text-slate-700 hover:border-slate-300"
+                                    ? "bg-indigo-50/50 border-indigo-150 text-indigo-955 shadow-xs hover:bg-indigo-100/50"
+                                    : "bg-slate-50 border-slate-150 hover:bg-slate-100/70 text-slate-700"
                                 }`}
                               >
                                 <div className="flex items-center justify-between w-full">
-                                  <div className={`p-1 rounded-lg ${isDone ? "bg-white/10 text-indigo-300" : "bg-slate-100 text-slate-500"}`}>
+                                  <div className={`p-1 rounded-lg ${isDone ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-500"}`}>
                                     <Moon size={13} />
                                   </div>
-                                  {isDone && <Check size={12} className="text-emerald-400 stroke-[3.5]" />}
+                                  {isDone && <Check size={12} className="text-emerald-600 stroke-[3.5]" />}
                                 </div>
                                 <div className="mt-2">
-                                  <p className="text-[10px] font-bold opacity-80">作息起居 🛌</p>
-                                  <p className="text-[11px] font-black truncate mt-0.5">
+                                  <p className="text-xs font-bold opacity-80">作息起居 🛌</p>
+                                  <p className="text-xs font-black truncate mt-0.5">
                                     {isDone ? `${todaySleep.wakeTime} 起床 (${todaySleep.duration}h)` : "等待登记"}
                                   </p>
                                 </div>
@@ -1916,19 +1884,19 @@ export default function App() {
                                 }}
                                 className={`text-left p-3 rounded-2xl border transition-all duration-200 active:scale-97 cursor-pointer flex flex-col justify-between min-h-[76px] relative overflow-hidden group ${
                                   isDone
-                                    ? "bg-gradient-to-br from-emerald-800 to-teal-950 border-emerald-950 text-white shadow-sm hover:opacity-95"
-                                    : "bg-slate-50/50 border-slate-200 hover:bg-slate-50 text-slate-700 hover:border-slate-300"
+                                    ? "bg-emerald-50/50 border-emerald-150 text-emerald-955 shadow-xs hover:bg-emerald-100/50"
+                                    : "bg-slate-50 border-slate-150 hover:bg-slate-100/70 text-slate-700"
                                 }`}
                               >
                                 <div className="flex items-center justify-between w-full">
-                                  <div className={`p-1 rounded-lg ${isDone ? "bg-white/10 text-emerald-300" : "bg-slate-100 text-slate-500"}`}>
+                                  <div className={`p-1 rounded-lg ${isDone ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
                                     <Utensils size={13} />
                                   </div>
-                                  {isDone && <Check size={12} className="text-emerald-300 stroke-[3.5]" />}
+                                  {isDone && <Check size={12} className="text-emerald-600 stroke-[3.5]" />}
                                 </div>
                                 <div className="mt-2">
-                                  <p className="text-[10px] font-bold opacity-80">每日膳食 🍎</p>
-                                  <p className="text-[11px] font-black truncate mt-0.5">
+                                  <p className="text-xs font-bold opacity-80">每日膳食 🍎</p>
+                                  <p className="text-xs font-black truncate mt-0.5">
                                     {isDone ? `已登记 ${mealCount} 餐` : "等待登记"}
                                   </p>
                                 </div>
@@ -1948,19 +1916,19 @@ export default function App() {
                                 }}
                                 className={`text-left p-3 rounded-2xl border transition-all duration-200 active:scale-97 cursor-pointer flex flex-col justify-between min-h-[76px] relative overflow-hidden group ${
                                   isDone
-                                    ? "bg-gradient-to-br from-orange-600 to-amber-955 border-orange-955 text-white shadow-sm hover:opacity-95"
-                                    : "bg-slate-50/50 border-slate-200 hover:bg-slate-50 text-slate-700 hover:border-slate-300"
+                                    ? "bg-orange-50/50 border-orange-150 text-orange-955 shadow-xs hover:bg-orange-100/50"
+                                    : "bg-slate-50 border-slate-150 hover:bg-slate-100/70 text-slate-700"
                                 }`}
                               >
                                 <div className="flex items-center justify-between w-full">
-                                  <div className={`p-1 rounded-lg ${isDone ? "bg-white/10 text-orange-300" : "bg-slate-100 text-slate-500"}`}>
+                                  <div className={`p-1 rounded-lg ${isDone ? "bg-orange-100 text-orange-700" : "bg-slate-100 text-slate-500"}`}>
                                     <Dumbbell size={13} />
                                   </div>
-                                  {isDone && <Check size={12} className="text-orange-400 stroke-[3.5]" />}
+                                  {isDone && <Check size={12} className="text-orange-600 stroke-[3.5]" />}
                                 </div>
                                 <div className="mt-2">
-                                  <p className="text-[10px] font-bold opacity-80">运动汗水 🏋️‍♀️</p>
-                                  <p className="text-[11px] font-black truncate mt-0.5">
+                                  <p className="text-xs font-bold opacity-80">运动汗水 🏋️‍♀️</p>
+                                  <p className="text-xs font-black truncate mt-0.5">
                                     {isDone ? `已暴汗 ${totalDuration} 分` : "等待登记"}
                                   </p>
                                 </div>
@@ -1980,19 +1948,19 @@ export default function App() {
                                 }}
                                 className={`text-left p-3 rounded-2xl border transition-all duration-200 active:scale-97 cursor-pointer flex flex-col justify-between min-h-[76px] relative overflow-hidden group ${
                                   isDone
-                                    ? "bg-gradient-to-br from-purple-800 to-pink-950 border-purple-955 text-white shadow-sm hover:opacity-95"
-                                    : "bg-slate-50/50 border-slate-200 hover:bg-slate-50 text-slate-700 hover:border-slate-300"
+                                    ? "bg-purple-50/50 border-purple-150 text-purple-955 shadow-xs hover:bg-purple-100/50"
+                                    : "bg-slate-50 border-slate-150 hover:bg-slate-100/70 text-slate-700"
                                 }`}
                               >
                                 <div className="flex items-center justify-between w-full">
-                                  <div className={`p-1 rounded-lg ${isDone ? "bg-white/10 text-purple-300" : "bg-slate-100 text-slate-500"}`}>
+                                  <div className={`p-1 rounded-lg ${isDone ? "bg-purple-100 text-purple-700" : "bg-slate-100 text-slate-500"}`}>
                                     <BookOpen size={13} />
                                   </div>
-                                  {isDone && <Check size={12} className="text-purple-300 stroke-[3.5]" />}
+                                  {isDone && <Check size={12} className="text-purple-600 stroke-[3.5]" />}
                                 </div>
                                 <div className="mt-2">
-                                  <p className="text-[10px] font-bold opacity-80">终身学习 📖</p>
-                                  <p className="text-[11px] font-black truncate mt-0.5">
+                                  <p className="text-xs font-bold opacity-80">终身学习 📖</p>
+                                  <p className="text-xs font-black truncate mt-0.5">
                                     {isDone ? `已专注 ${totalDuration} 分` : "等待登记"}
                                   </p>
                                 </div>
@@ -2012,19 +1980,19 @@ export default function App() {
                                 }}
                                 className={`text-left p-3 rounded-2xl border transition-all duration-200 active:scale-97 cursor-pointer flex flex-col justify-between min-h-[76px] relative overflow-hidden group ${
                                   isDone
-                                    ? "bg-gradient-to-br from-cyan-600 to-blue-900 border-cyan-955 text-white shadow-sm hover:opacity-95"
-                                    : "bg-slate-50/50 border-slate-200 hover:bg-slate-50 text-slate-700 hover:border-slate-300"
+                                    ? "bg-sky-50/50 border-sky-150 text-sky-955 shadow-xs hover:bg-sky-100/50"
+                                    : "bg-slate-50 border-slate-150 hover:bg-slate-100/70 text-slate-700"
                                 }`}
                               >
                                 <div className="flex items-center justify-between w-full">
-                                  <div className={`p-1 rounded-lg ${isDone ? "bg-white/10 text-cyan-300" : "bg-slate-100 text-slate-500"}`}>
+                                  <div className={`p-1 rounded-lg ${isDone ? "bg-sky-100 text-sky-700" : "bg-slate-100 text-slate-500"}`}>
                                     <Droplet size={13} />
                                   </div>
-                                  {isDone && <Check size={12} className="text-cyan-300 stroke-[3.5]" />}
+                                  {isDone && <Check size={12} className="text-sky-600 stroke-[3.5]" />}
                                 </div>
                                 <div className="mt-2">
-                                  <p className="text-[10px] font-bold opacity-80">水杯盈盈 💧</p>
-                                  <p className="text-[11px] font-black truncate mt-0.5">
+                                  <p className="text-xs font-bold opacity-80">水杯盈盈 💧</p>
+                                  <p className="text-xs font-black truncate mt-0.5">
                                     {isDone ? `已饮水 ${totalAmount} ml` : "等待登记"}
                                   </p>
                                 </div>
@@ -2044,19 +2012,19 @@ export default function App() {
                                 }}
                                 className={`text-left p-3 rounded-2xl border transition-all duration-200 active:scale-97 cursor-pointer flex flex-col justify-between min-h-[76px] relative overflow-hidden group ${
                                   isDone
-                                    ? "bg-gradient-to-br from-slate-750 to-slate-900 border-slate-900 text-white shadow-sm hover:opacity-95"
-                                    : "bg-slate-50/50 border-slate-200 hover:bg-slate-50 text-slate-700 hover:border-slate-300"
+                                    ? "bg-slate-100 border-slate-200 text-slate-900 shadow-xs hover:bg-slate-200/50"
+                                    : "bg-slate-50 border-slate-150 hover:bg-slate-100/70 text-slate-700"
                                 }`}
                               >
                                 <div className="flex items-center justify-between w-full">
-                                  <div className={`p-1 rounded-lg ${isDone ? "bg-white/10 text-slate-300" : "bg-slate-100 text-slate-500"}`}>
+                                  <div className={`p-1 rounded-lg ${isDone ? "bg-slate-300/85 text-slate-750" : "bg-slate-100 text-slate-500"}`}>
                                     <Scale size={13} />
                                   </div>
-                                  {isDone && <Check size={12} className="text-slate-200 stroke-[3.5]" />}
+                                  {isDone && <Check size={12} className="text-slate-600 stroke-[3.5]" />}
                                 </div>
                                 <div className="mt-2">
-                                  <p className="text-[10px] font-bold opacity-80">体重监测 ⚖️</p>
-                                  <p className="text-[11px] font-black truncate mt-0.5">
+                                  <p className="text-xs font-bold opacity-80">体重监测 ⚖️</p>
+                                  <p className="text-xs font-black truncate mt-0.5">
                                     {isDone ? `${todayWeight.weight} kg` : "等待登记"}
                                   </p>
                                 </div>
@@ -2069,12 +2037,12 @@ export default function App() {
                       {/* 2. Custom Oath Checklist */}
                       <div className="space-y-3 border-t border-slate-100 pt-5">
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                          <h4 className="text-[10px] text-slate-400 font-black tracking-wider uppercase flex items-center gap-1.5">
+                          <h4 className="text-xs text-slate-400 font-bold tracking-wider uppercase flex items-center gap-1.5">
                             <span>🎯 自定义必做誓愿</span>
                           </h4>
                           
                           {/* Filter Tabs */}
-                          <div className="flex bg-slate-100 p-0.5 rounded-lg border text-[9.5px]">
+                          <div className="flex bg-slate-100 p-0.5 rounded-lg border text-xs">
                             {([
                               { id: "all", label: "全部" },
                               { id: "today", label: "今日" },
@@ -2107,7 +2075,7 @@ export default function App() {
                             return (
                               <div className="py-6 border border-dashed border-slate-200 rounded-2xl text-center space-y-1">
                                 <p className="text-xs text-slate-450 font-bold">当前无任何誓愿安排 ~</p>
-                                <p className="text-[9.5px] text-slate-400">可在下方直接快捷录入新的必做要求</p>
+                                <p className="text-xs text-slate-400">可在下方直接快捷录入新的必做要求</p>
                               </div>
                             );
                           }
@@ -2119,8 +2087,8 @@ export default function App() {
                                   key={task.id}
                                   className={`flex items-center justify-between p-2.5 rounded-xl border transition-all duration-200 group ${
                                     task.completed
-                                      ? "bg-slate-50/50 border-slate-100 text-slate-405"
-                                      : "bg-white border-slate-200 hover:border-slate-350 text-slate-800"
+                                      ? "bg-slate-50 border-slate-100 text-slate-400"
+                                      : "bg-white border-slate-200 hover:border-slate-300 text-slate-800"
                                   }`}
                                 >
                                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -2129,8 +2097,8 @@ export default function App() {
                                       onClick={() => handleToggleTask(task.id)}
                                       className={`h-5 w-5 rounded-full border flex items-center justify-center shrink-0 cursor-pointer transition-all duration-205 ${
                                         task.completed
-                                          ? "bg-slate-900 border-slate-900 text-emerald-450"
-                                          : "border-slate-300 hover:border-emerald-500 hover:bg-emerald-50 text-transparent hover:text-emerald-500"
+                                          ? "bg-indigo-650 border-indigo-650 text-white"
+                                          : "border-slate-300 hover:border-indigo-500 hover:bg-indigo-50 text-transparent hover:text-indigo-500"
                                       }`}
                                     >
                                       <Check size={11} className="stroke-[3.5]" />
@@ -2141,7 +2109,7 @@ export default function App() {
                                         {task.text}
                                       </p>
                                       <div className="flex items-center gap-1.5 mt-0.5">
-                                        <span className={`text-[8.5px] px-1 rounded-sm font-black uppercase tracking-wider ${
+                                        <span className={`text-xs px-1 rounded-sm font-black uppercase tracking-wider ${
                                           task.period === "today"
                                             ? "bg-emerald-50 text-emerald-700"
                                             : task.period === "week"
@@ -2150,7 +2118,7 @@ export default function App() {
                                         }`}>
                                           {task.period === "today" ? "今日" : task.period === "week" ? "每周" : "本月"}
                                         </span>
-                                        <span className="text-[8.5px] text-slate-400 font-semibold font-mono">
+                                        <span className="text-xs text-slate-400 font-semibold font-mono">
                                           {task.time || "⏰ 全天"}
                                         </span>
                                       </div>
@@ -2177,7 +2145,7 @@ export default function App() {
                             <select
                               value={quickTaskPeriod}
                               onChange={(e) => setQuickTaskPeriod(e.target.value as any)}
-                              className="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[10.5px] font-bold text-slate-700 focus:outline-none shrink-0"
+                              className="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-700 focus:outline-none shrink-0"
                             >
                               <option value="today">📅 今日必做</option>
                               <option value="week">🗓️ 本周必做</option>
@@ -2191,7 +2159,7 @@ export default function App() {
                               placeholder="快速添加下一个誓愿行动细节..."
                               value={quickTaskText}
                               onChange={(e) => setQuickTaskText(e.target.value)}
-                              className="flex-1 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[10.5px] text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-300 font-semibold"
+                              className="flex-1 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-300 font-semibold"
                             />
                           </div>
 
@@ -2202,12 +2170,12 @@ export default function App() {
                               placeholder="约束时间，例如：07:30、睡觉前 (选填)"
                               value={quickTaskTime}
                               onChange={(e) => setQuickTaskTime(e.target.value)}
-                              className="flex-1 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[10px] text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-300"
+                              className="flex-1 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-300"
                             />
                             
                             <button
                               type="submit"
-                              className="bg-slate-900 hover:bg-slate-950 text-white font-black px-3 py-1.5 rounded-lg text-[10.5px] transition-transform active:scale-95 cursor-pointer shrink-0 flex items-center gap-0.5 shadow-sm"
+                              className="bg-indigo-605 hover:bg-indigo-700 text-white font-black px-3 py-1.5 rounded-lg text-xs transition-transform active:scale-95 cursor-pointer shrink-0 flex items-center gap-0.5 shadow-sm"
                             >
                               <Plus size={12} className="stroke-[3]" />
                               <span>新增誓愿</span>
@@ -2221,11 +2189,11 @@ export default function App() {
                     <section className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-5">
                       
                       <div className="border-b border-slate-100 pb-2.5 flex items-center justify-between">
-                        <h3 className="text-xs font-black text-slate-900 tracking-tight flex items-center gap-1.5">
+                        <h3 className="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-1.5">
                           <span>📊 今日修行流水账</span>
-                          <span className="text-[9.5px] font-semibold text-slate-400">({new Date().toISOString().split("T")[0]})</span>
+                          <span className="text-xs font-semibold text-slate-400">({new Date().toISOString().split("T")[0]})</span>
                         </h3>
-                        <span className="text-[9.5px] font-bold text-slate-500 bg-slate-50 border px-2 py-0.5 rounded">
+                        <span className="text-xs font-bold text-slate-500 bg-slate-50 border px-2 py-0.5 rounded">
                           今日累积打卡: {activeCheckIns.totalCount}次
                         </span>
                       </div>
@@ -2234,36 +2202,36 @@ export default function App() {
                         <div className="py-12 border border-dashed border-slate-150 rounded-xl text-center space-y-1">
                           <Clock size={18} className="mx-auto text-slate-300" />
                           <p className="text-xs text-slate-500 font-bold">今天还没有创建任何打卡印记哦</p>
-                          <p className="text-[10px] text-slate-450">点击大圆按钮，登记您今天的首个自律足迹吧！</p>
+                          <p className="text-xs text-slate-450">点击大圆按钮，登记您今天的首个自律足迹吧！</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
                           
                           {/* Sleeps */}
                           {activeCheckIns.sleeps.map((record) => (
-                            <div key={record.id} className="flex gap-3 bg-slate-50/70 border border-slate-200 p-3 rounded-xl justify-between group">
+                            <div key={record.id} className="flex gap-3 bg-slate-50 border border-slate-150 p-3 rounded-xl justify-between group">
                               <div className="flex items-start gap-2.5">
-                                <div className="bg-slate-900 p-1.5 text-white rounded-lg shrink-0 mt-0.5">
+                                <div className="bg-indigo-650 p-1.5 text-white rounded-lg shrink-0 mt-0.5">
                                   <Moon size={12} />
                                 </div>
                                 <div className="space-y-0.5">
                                   <div className="flex items-center gap-2">
                                     <span className="font-bold text-slate-805 text-xs">🛌 作息数据打卡</span>
-                                    <span className="text-[9px] bg-slate-200 text-slate-700 px-1 rounded font-bold font-mono">
+                                    <span className="text-xs bg-slate-200 text-slate-700 px-1 rounded font-bold font-mono">
                                       {record.duration}小时
                                     </span>
                                   </div>
                                   <p className="text-slate-600 font-semibold text-xs py-0.5">
                                     {record.sleepTime} 入睡 &rarr; {record.wakeTime} 晨醒
                                   </p>
-                                  {record.note && <p className="text-[10px] text-slate-400 italic">“ {record.note} ”</p>}
+                                  {record.note && <p className="text-xs text-slate-400 italic">“ {record.note} ”</p>}
                                 </div>
                               </div>
 
                               <div className="flex flex-col items-end justify-between shrink-0">
                                 <button
                                   onClick={() => setSleepRecords(sleepRecords.filter(r => r.id !== record.id))}
-                                  className="text-[10px] text-slate-300 hover:text-rose-500 transition-colors cursor-pointer"
+                                  className="text-xs text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                                 >
                                   删除
                                 </button>
@@ -2278,7 +2246,7 @@ export default function App() {
 
                           {/* Meals */}
                           {activeCheckIns.meals.map((record) => (
-                            <div key={record.id} className="flex gap-3 bg-slate-50/70 border border-slate-200 p-3 rounded-xl justify-between group">
+                            <div key={record.id} className="flex gap-3 bg-slate-50 border border-slate-150 p-3 rounded-xl justify-between group">
                               <div className="flex items-start gap-2.5">
                                 <div className="bg-emerald-600 p-1.5 text-white rounded-lg shrink-0 mt-0.5">
                                   <Utensils size={12} />
@@ -2286,13 +2254,13 @@ export default function App() {
                                 <div className="space-y-0.5">
                                   <div className="flex items-center gap-2">
                                     <span className="font-bold text-slate-805 text-xs">🍎 饮食营养打卡</span>
-                                    <span className="text-[9px] bg-emerald-105 text-emerald-800 px-1.5 rounded font-extrabold uppercase">
+                                    <span className="text-xs bg-emerald-100 text-emerald-800 px-1.5 rounded font-extrabold uppercase">
                                       {record.period}
                                     </span>
                                   </div>
                                   <p className="text-slate-800 font-bold text-xs pt-1 leading-snug">{record.text}</p>
                                   {record.note && (
-                                    <p className="text-[10px] text-slate-450 italic mt-0.5 bg-white border border-slate-100 p-1 px-2 rounded">
+                                    <p className="text-xs text-slate-450 italic mt-0.5 bg-white border border-slate-100 p-1 px-2 rounded">
                                       备注: {record.note}
                                     </p>
                                   )}
@@ -2302,7 +2270,7 @@ export default function App() {
                               <span className="shrink-0">
                                 <button
                                   onClick={() => setMealItems(mealItems.filter(m => m.id !== record.id))}
-                                  className="text-[10px] text-slate-300 hover:text-rose-500 transition-colors cursor-pointer"
+                                  className="text-xs text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                                 >
                                   删除
                                 </button>
@@ -2312,7 +2280,7 @@ export default function App() {
 
                           {/* Workouts */}
                           {activeCheckIns.workouts.map((record) => (
-                            <div key={record.id} className="flex gap-3 bg-slate-50/70 border border-slate-200 p-3 rounded-xl justify-between group">
+                            <div key={record.id} className="flex gap-3 bg-slate-50 border border-slate-150 p-3 rounded-xl justify-between group">
                               <div className="flex items-start gap-2.5">
                                 <div className="bg-orange-500 p-1.5 text-white rounded-lg shrink-0 mt-0.5">
                                   <Dumbbell size={12} />
@@ -2320,12 +2288,12 @@ export default function App() {
                                 <div className="space-y-0.5">
                                   <div className="flex items-center gap-2">
                                     <span className="font-bold text-slate-805 text-xs">🏋️ 运动汗水打卡</span>
-                                    <span className="text-[9px] bg-orange-100 text-orange-850 px-1.5 rounded font-bold font-mono">
+                                    <span className="text-xs bg-orange-100 text-orange-800 px-1.5 rounded font-bold font-mono">
                                       {record.duration}分钟
                                     </span>
                                   </div>
                                   <p className="text-slate-700 font-bold text-xs">{record.type}</p>
-                                  <span className="text-[9px] text-slate-400 font-semibold font-mono">
+                                  <span className="text-xs text-slate-400 font-semibold font-mono">
                                     能量狂飙 ~ {record.calories} kcal
                                   </span>
                                 </div>
@@ -2334,7 +2302,7 @@ export default function App() {
                               <span className="shrink-0">
                                 <button
                                   onClick={() => setWorkoutRecords(workoutRecords.filter(w => w.id !== record.id))}
-                                  className="text-[10px] text-slate-300 hover:text-rose-500 transition-colors cursor-pointer"
+                                  className="text-xs text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                                 >
                                   删除
                                 </button>
@@ -2344,7 +2312,7 @@ export default function App() {
 
                           {/* Study */}
                           {activeCheckIns.studies.map((record) => (
-                            <div key={record.id} className="flex gap-3 bg-slate-50/70 border border-slate-200 p-3 rounded-xl justify-between group">
+                            <div key={record.id} className="flex gap-3 bg-slate-50 border border-slate-150 p-3 rounded-xl justify-between group">
                               <div className="flex items-start gap-2.5">
                                 <div className="bg-blue-600 p-1.5 text-white rounded-lg shrink-0 mt-0.5">
                                   <BookOpen size={12} />
@@ -2352,7 +2320,7 @@ export default function App() {
                                 <div className="space-y-0.5">
                                   <div className="flex items-center gap-2">
                                     <span className="font-bold text-slate-805 text-xs">📖 终身学习打卡</span>
-                                    <span className="text-[9px] bg-blue-100 text-blue-800 px-1.5 rounded font-bold font-mono">
+                                    <span className="text-xs bg-blue-100 text-blue-800 px-1.5 rounded font-bold font-mono">
                                       专注 {record.duration}分钟
                                     </span>
                                   </div>
@@ -2363,7 +2331,7 @@ export default function App() {
                               <span className="shrink-0">
                                 <button
                                   onClick={() => setStudyRecords(studyRecords.filter(s => s.id !== record.id))}
-                                  className="text-[10px] text-slate-300 hover:text-rose-500 transition-colors cursor-pointer"
+                                  className="text-xs text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                                 >
                                   删除
                                 </button>
@@ -2373,7 +2341,7 @@ export default function App() {
 
                           {/* Waters */}
                           {activeCheckIns.waters.map((record) => (
-                            <div key={record.id} className="flex gap-3 bg-slate-50/70 border border-slate-200 p-3 rounded-xl justify-between group">
+                            <div key={record.id} className="flex gap-3 bg-slate-50 border border-slate-150 p-3 rounded-xl justify-between group">
                               <div className="flex items-start gap-2.5">
                                 <div className="bg-sky-500 p-1.5 text-white rounded-lg shrink-0 mt-0.5">
                                   <Droplet size={12} />
@@ -2381,11 +2349,11 @@ export default function App() {
                                 <div className="space-y-0.5">
                                   <div className="flex items-center gap-2">
                                     <span className="font-bold text-slate-850 text-xs">🥛 补水喝水打卡</span>
-                                    <span className="text-[9px] bg-sky-100 text-sky-850 px-1.5 rounded font-bold font-mono">
+                                    <span className="text-xs bg-sky-100 text-sky-800 px-1.5 rounded font-bold font-mono">
                                       {record.amount} ml
                                     </span>
                                   </div>
-                                  <p className="text-slate-450 font-semibold text-[10px] pt-0.5">
+                                  <p className="text-slate-450 font-semibold text-xs pt-0.5">
                                     记录时间：{record.time}
                                   </p>
                                 </div>
@@ -2394,7 +2362,7 @@ export default function App() {
                               <span className="shrink-0">
                                 <button
                                   onClick={() => setWaterRecords(waterRecords.filter(w => w.id !== record.id))}
-                                  className="text-[10px] text-slate-300 hover:text-rose-500 transition-colors cursor-pointer"
+                                  className="text-xs text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                                 >
                                   删除
                                 </button>
@@ -2404,7 +2372,7 @@ export default function App() {
 
                           {/* Weights */}
                           {activeCheckIns.weights.map((record) => (
-                            <div key={record.id} className="flex gap-3 bg-slate-50/70 border border-slate-200 p-3 rounded-xl justify-between group">
+                            <div key={record.id} className="flex gap-3 bg-slate-50 border border-slate-150 p-3 rounded-xl justify-between group">
                               <div className="flex items-start gap-2.5">
                                 <div className="bg-amber-500 p-1.5 text-white rounded-lg shrink-0 mt-0.5">
                                   <Scale size={12} />
@@ -2412,11 +2380,11 @@ export default function App() {
                                 <div className="space-y-0.5">
                                   <div className="flex items-center gap-2">
                                     <span className="font-bold text-slate-850 text-xs">⚖️ 体重记录</span>
-                                    <span className="text-[9px] bg-amber-100 text-amber-850 px-1.5 rounded font-bold font-mono">
+                                    <span className="text-xs bg-amber-100 text-amber-800 px-1.5 rounded font-bold font-mono">
                                       {record.weight} kg
                                     </span>
                                   </div>
-                                  <p className="text-slate-450 font-semibold text-[10px] pt-0.5">
+                                  <p className="text-slate-450 font-semibold text-xs pt-0.5">
                                     记录时间：{record.time} {record.note && `(${record.note})`}
                                   </p>
                                 </div>
@@ -2425,7 +2393,7 @@ export default function App() {
                               <span className="shrink-0">
                                 <button
                                   onClick={() => setWeightRecords(weightRecords.filter(w => w.id !== record.id))}
-                                  className="text-[10px] text-slate-300 hover:text-rose-500 transition-colors cursor-pointer"
+                                  className="text-xs text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                                 >
                                   删除
                                 </button>
@@ -2451,13 +2419,13 @@ export default function App() {
                     className="space-y-6"
                   >
                     {/* Sub tabs inside AI Studio */}
-                    <div className="bg-slate-900 text-white rounded-3xl p-1 grid grid-cols-4 gap-1 select-none text-center">
+                    <div className="bg-slate-100 text-slate-600 rounded-3xl p-1 grid grid-cols-4 gap-1 select-none text-center">
                       {(["diet", "workout", "challenge", "learning"] as const).map((tab) => (
                         <button
                           key={tab}
                           onClick={() => { setAiSubTab(tab); setAiError(""); }}
-                          className={`py-2 text-[10.5px] rounded-2xl cursor-pointer flex flex-col items-center gap-1 transition-all ${
-                            aiSubTab === tab ? "bg-white text-slate-900 font-extrabold shadow" : "text-slate-400 hover:text-white"
+                          className={`py-2 text-xs rounded-2xl cursor-pointer flex flex-col items-center gap-1 transition-all ${
+                            aiSubTab === tab ? "bg-white text-slate-900 font-extrabold shadow-sm" : "text-slate-500 hover:text-slate-800"
                           }`}
                         >
                           {tab === "diet" && <Utensils size={14} />}
@@ -2477,12 +2445,12 @@ export default function App() {
                     {/* AI Loading state placeholder */}
                     {isAiLoading && (
                       <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center flex flex-col items-center justify-center space-y-4 shadow-sm animate-pulse">
-                        <div className="h-12 w-12 rounded-full bg-slate-950 text-emerald-400 flex items-center justify-center text-lg font-black animate-spin">
+                        <div className="h-12 w-12 rounded-full bg-indigo-600 text-white flex items-center justify-center text-lg font-black animate-spin">
                           🌀
                         </div>
                         <div>
                           <p className="text-xs font-bold text-slate-800">自律修行大模型正在深思构想中...</p>
-                          <p className="text-[9.5px] text-slate-400 mt-1">这大约需要 5-15 秒，正在分析您的修行流水...</p>
+                          <p className="text-xs text-slate-400 mt-1">这大约需要 5-15 秒，正在分析您的修行流水...</p>
                         </div>
                       </div>
                     )}
@@ -2492,7 +2460,7 @@ export default function App() {
                       <div className="bg-rose-50 border border-rose-100 rounded-2xl p-4 text-xs text-rose-700 space-y-1">
                         <p className="font-bold flex items-center gap-1">⚠️ 服务运行异常：</p>
                         <p className="leading-relaxed font-semibold">{aiError}</p>
-                        <p className="text-[10px] text-rose-500 pt-1">提示：请检查设置页中 Worker 地址与 AI 提供商的 API Key 挂载状态。</p>
+                        <p className="text-xs text-rose-500 pt-1">提示：请检查设置页中 Worker 地址与 AI 提供商的 API Key 挂载状态。</p>
                       </div>
                     )}
 
@@ -2506,10 +2474,10 @@ export default function App() {
                               <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-5 text-left">
                                 <div className="text-center space-y-1">
                                   <h3 className="text-sm font-black text-slate-800">深度剖析今日膳食</h3>
-                                  <p className="text-[10.5px] text-slate-400">大模型将对您今日记录的所有餐饮流水进行全盘剖析</p>
+                                  <p className="text-xs text-slate-400">大模型将对您今日记录的所有餐饮流水进行全盘剖析</p>
                                 </div>
 
-                                <div className="border border-slate-100 rounded-xl p-4 bg-slate-50 text-[11px] space-y-2">
+                                <div className="border border-slate-100 rounded-xl p-4 bg-slate-50 text-xs space-y-2">
                                   <p className="font-bold text-slate-650 border-b pb-1">今日已登记餐点：</p>
                                   {mealItems.filter(m => m.date === todayStr).length === 0 ? (
                                     <p className="text-slate-400 italic">您今天还没有登记任何饮食打卡哦！请先在“主页”打卡。</p>
@@ -2528,7 +2496,7 @@ export default function App() {
                                 <button
                                   onClick={handleGetDietAdvice}
                                   disabled={mealItems.filter(m => m.date === todayStr).length === 0}
-                                  className="w-full bg-slate-900 hover:bg-slate-950 text-white font-black py-3 rounded-xl tracking-wider text-xs shadow cursor-pointer transition-all active:scale-99 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
+                                  className="w-full bg-indigo-605 hover:bg-indigo-700 text-white font-black py-3 rounded-xl tracking-wider text-xs shadow cursor-pointer transition-all active:scale-99 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                                 >
                                   ⚡ 一键深度剖析营养成分
                                 </button>
@@ -2538,10 +2506,10 @@ export default function App() {
                                 <div className="flex items-center justify-between border-b pb-3">
                                   <div className="space-y-0.5">
                                     <h4 className="text-xs font-black text-slate-805">今日膳食测评报告</h4>
-                                    <p className="text-[9.5px] text-slate-400">由 AI 营养自律导师评估生成</p>
+                                    <p className="text-xs text-slate-400">由 AI 营养自律导师评估生成</p>
                                   </div>
                                   <div className="flex items-center gap-2">
-                                    <span className="text-[10px] text-slate-400 font-bold">健康得分</span>
+                                    <span className="text-xs text-slate-400 font-bold">健康得分</span>
                                     <div className="h-10 w-10 rounded-full bg-emerald-50 text-emerald-700 border-2 border-emerald-505 flex items-center justify-center font-bold text-xs shadow-sm">
                                       {dietAdvice.score}
                                     </div>
@@ -2551,19 +2519,19 @@ export default function App() {
                                 {/* Macros */}
                                 <div className="grid grid-cols-4 gap-2 text-center text-xs">
                                   <div className="bg-orange-50/50 p-2.5 rounded-xl border border-orange-100/50">
-                                    <div className="text-[9px] text-orange-600 font-bold mb-0.5">热量估算</div>
+                                    <div className="text-xs text-orange-600 font-bold mb-0.5">热量估算</div>
                                     <div className="font-black text-orange-950 truncate">{dietAdvice.calories} kcal</div>
                                   </div>
                                   <div className="bg-sky-50/50 p-2.5 rounded-xl border border-sky-100/50">
-                                    <div className="text-[9px] text-sky-650 font-bold mb-0.5">碳水化合物</div>
+                                    <div className="text-xs text-sky-650 font-bold mb-0.5">碳水化合物</div>
                                     <div className="font-black text-sky-855 truncate">{dietAdvice.carb}</div>
                                   </div>
                                   <div className="bg-indigo-50/50 p-2.5 rounded-xl border border-indigo-100/50">
-                                    <div className="text-[9px] text-indigo-605 font-bold mb-0.5">蛋白质</div>
+                                    <div className="text-xs text-indigo-605 font-bold mb-0.5">蛋白质</div>
                                     <div className="font-black text-indigo-855 truncate">{dietAdvice.protein}</div>
                                   </div>
                                   <div className="bg-rose-50/50 p-2.5 rounded-xl border border-rose-100/50">
-                                    <div className="text-[9px] text-rose-600 font-bold mb-0.5">脂肪</div>
+                                    <div className="text-xs text-rose-600 font-bold mb-0.5">脂肪</div>
                                     <div className="font-black text-rose-855 truncate">{dietAdvice.fat}</div>
                                   </div>
                                 </div>
@@ -2582,7 +2550,7 @@ export default function App() {
 
                                 <button
                                   onClick={() => setDietAdvice(null)}
-                                  className="w-full border border-slate-200 hover:bg-slate-50 text-slate-500 font-bold py-2 rounded-xl text-[11px] transition-colors cursor-pointer text-center"
+                                  className="w-full border border-slate-200 hover:bg-slate-50 text-slate-500 font-bold py-2 rounded-xl text-xs transition-colors cursor-pointer text-center"
                                 >
                                   🗑️ 重新剖析新流水
                                 </button>
@@ -2598,12 +2566,12 @@ export default function App() {
                               <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4 text-left">
                                 <div className="text-center space-y-1 mb-2">
                                   <h3 className="text-sm font-black text-slate-800">智能专属运动路线生成</h3>
-                                  <p className="text-[10.5px] text-slate-400">结合您的基础与时间，生成合理的单次路线计划</p>
+                                  <p className="text-xs text-slate-400">结合您的基础与时间，生成合理的单次路线计划</p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3 text-xs text-slate-750">
                                   <div className="space-y-1">
-                                    <label className="text-[10px] text-slate-500 font-bold">健身目标</label>
+                                    <label className="text-xs text-slate-500 font-bold">健身目标</label>
                                     <select
                                       value={workoutTarget}
                                       onChange={(e) => setWorkoutTarget(e.target.value)}
@@ -2618,7 +2586,7 @@ export default function App() {
                                   </div>
 
                                   <div className="space-y-1">
-                                    <label className="text-[10px] text-slate-500 font-bold">运动基础</label>
+                                    <label className="text-xs text-slate-500 font-bold">运动基础</label>
                                     <select
                                       value={workoutLevel}
                                       onChange={(e) => setWorkoutLevel(e.target.value)}
@@ -2631,7 +2599,7 @@ export default function App() {
                                   </div>
 
                                   <div className="space-y-1">
-                                    <label className="text-[10px] text-slate-500 font-bold">预计时长 (分钟)</label>
+                                    <label className="text-xs text-slate-500 font-bold">预计时长 (分钟)</label>
                                     <input
                                       type="number"
                                       min={10}
@@ -2643,7 +2611,7 @@ export default function App() {
                                   </div>
 
                                   <div className="space-y-1">
-                                    <label className="text-[10px] text-slate-500 font-bold">性别与年龄</label>
+                                    <label className="text-xs text-slate-500 font-bold">性别与年龄</label>
                                     <div className="grid grid-cols-2 gap-1.5">
                                       <select
                                         value={workoutGender}
@@ -2667,7 +2635,7 @@ export default function App() {
 
                                 <button
                                   onClick={handleGetWorkoutPlan}
-                                  className="w-full bg-slate-900 hover:bg-slate-950 text-white font-black py-3 rounded-xl tracking-wider text-xs shadow cursor-pointer transition-all active:scale-99"
+                                  className="w-full bg-indigo-605 hover:bg-indigo-700 text-white font-black py-3 rounded-xl tracking-wider text-xs shadow cursor-pointer transition-all active:scale-99"
                                 >
                                   🏋️ 一键定制个性化单次计划
                                 </button>
@@ -2675,7 +2643,7 @@ export default function App() {
                             ) : (
                               <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-md text-left space-y-5">
                                 <div className="border-b pb-2">
-                                  <span className="text-[9.5px] bg-orange-100 text-orange-850 px-2 py-0.5 rounded font-extrabold uppercase">
+                                  <span className="text-xs bg-orange-100 text-orange-850 px-2 py-0.5 rounded font-extrabold uppercase">
                                     AI 定制训练路径
                                   </span>
                                   <h3 className="text-sm font-black text-slate-800 mt-1.5">
@@ -2685,11 +2653,11 @@ export default function App() {
 
                                 <div className="grid grid-cols-2 gap-2 text-center text-xs">
                                   <div className="bg-orange-50/50 p-2.5 rounded-xl border border-orange-100/50">
-                                    <div className="text-[9px] text-orange-600 font-bold mb-0.5">预计总时长</div>
+                                    <div className="text-xs text-orange-600 font-bold mb-0.5">预计总时长</div>
                                     <div className="font-black text-orange-950 truncate">{(workoutPlan.totalDurationMinutes || workoutPlan.totalDuration)} 分钟</div>
                                   </div>
                                   <div className="bg-rose-50/50 p-2.5 rounded-xl border border-rose-100/50">
-                                    <div className="text-[9px] text-rose-600 font-bold mb-0.5">预计消耗热量</div>
+                                    <div className="text-xs text-rose-600 font-bold mb-0.5">预计消耗热量</div>
                                     <div className="font-black text-rose-950 truncate">{(workoutPlan.estimatedCalories || 240)} kcal</div>
                                   </div>
                                 </div>
@@ -2709,9 +2677,9 @@ export default function App() {
                                         <div key={i} className="bg-slate-50 border rounded-xl p-3 flex justify-between items-start gap-4">
                                           <div className="space-y-0.5">
                                             <p className="font-black text-slate-800 text-[11.5px]">{ex.name}</p>
-                                            <p className="text-slate-500 font-semibold text-[10.5px]">{ex.description}</p>
+                                            <p className="text-slate-500 font-semibold text-xs">{ex.description}</p>
                                           </div>
-                                          <div className="text-right shrink-0 text-[10.5px]">
+                                          <div className="text-right shrink-0 text-xs">
                                             <span className="bg-slate-200 text-slate-700 font-extrabold px-2 py-0.5 rounded-md block mb-1">
                                               {ex.sets}
                                             </span>
@@ -2737,7 +2705,7 @@ export default function App() {
 
                                 <button
                                   onClick={() => setWorkoutPlan(null)}
-                                  className="w-full border border-slate-200 hover:bg-slate-50 text-slate-500 font-bold py-2 rounded-xl text-[11px] transition-colors cursor-pointer text-center"
+                                  className="w-full border border-slate-200 hover:bg-slate-50 text-slate-500 font-bold py-2 rounded-xl text-xs transition-colors cursor-pointer text-center"
                                 >
                                   🗑️ 重新制定新计划
                                 </button>
@@ -2753,11 +2721,11 @@ export default function App() {
                               <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4 text-left">
                                 <div className="text-center space-y-1 mb-2">
                                   <h3 className="text-sm font-black text-slate-800">随机开启修行挑战</h3>
-                                  <p className="text-[10.5px] text-slate-400">选择您感兴趣的维度，让 AI 构思一项本周小冒险</p>
+                                  <p className="text-xs text-slate-400">选择您感兴趣的维度，让 AI 构思一项本周小冒险</p>
                                 </div>
 
                                 <div className="space-y-2">
-                                  <label className="text-[10.5px] text-slate-500 font-bold uppercase tracking-wider block">自律兴趣标签 (多选)</label>
+                                  <label className="text-xs text-slate-500 font-bold uppercase tracking-wider block">自律兴趣标签 (多选)</label>
                                   <div className="flex flex-wrap gap-1.5 select-none">
                                     {["日常自律", "读书写作", "健身塑形", "断舍离", "理财储蓄", "早起早睡", "心理冥想", "动手做饭", "数字戒毒"].map((tag) => {
                                       const active = selectedInterests.includes(tag);
@@ -2774,7 +2742,7 @@ export default function App() {
                                           }}
                                           className={`px-3 py-1.5 text-xs font-semibold rounded-full border transition-all cursor-pointer ${
                                             active
-                                              ? "bg-slate-900 border-slate-900 text-white font-bold"
+                                              ? "bg-indigo-600 border-slate-900 text-white font-bold"
                                               : "bg-slate-50 border-slate-200 text-slate-650 hover:bg-slate-100"
                                           }`}
                                         >
@@ -2787,7 +2755,7 @@ export default function App() {
 
                                 <button
                                   onClick={handleGetSkillChallenge}
-                                  className="w-full bg-slate-900 hover:bg-slate-950 text-white font-black py-3 rounded-xl tracking-wider text-xs shadow cursor-pointer transition-all active:scale-99"
+                                  className="w-full bg-indigo-605 hover:bg-indigo-700 text-white font-black py-3 rounded-xl tracking-wider text-xs shadow cursor-pointer transition-all active:scale-99"
                                 >
                                   🧭 探索生成一项随机挑战
                                 </button>
@@ -2796,14 +2764,14 @@ export default function App() {
                               <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-md text-left space-y-5">
                                 <div className="border-b pb-2 flex justify-between items-start gap-4">
                                   <div>
-                                    <span className="text-[9px] bg-purple-100 text-purple-800 px-2 py-0.5 rounded font-extrabold uppercase">
+                                    <span className="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded font-extrabold uppercase">
                                       {skillChallenge.category}
                                     </span>
                                     <h3 className="text-sm font-black text-slate-805 mt-1.5">
                                       ⚔️ 挑战：{skillChallenge.title}
                                     </h3>
                                   </div>
-                                  <div className="text-right shrink-0 text-[10px]">
+                                  <div className="text-right shrink-0 text-xs">
                                     <span className="bg-slate-100 border text-slate-600 font-extrabold px-1.5 py-0.5 rounded block mb-1">
                                       {skillChallenge.difficulty}
                                     </span>
@@ -2822,7 +2790,7 @@ export default function App() {
                                     <div className="space-y-1.5">
                                       {skillChallenge.steps.map((st: string, i: number) => (
                                         <div key={i} className="flex gap-2 items-start font-semibold text-slate-700">
-                                          <span className="h-4 w-4 rounded-full bg-slate-900 text-white text-[9px] flex items-center justify-center font-bold shrink-0 mt-0.5">
+                                          <span className="h-4 w-4 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">
                                             {i + 1}
                                           </span>
                                           <span>{st}</span>
@@ -2841,13 +2809,13 @@ export default function App() {
                                 <div className="grid grid-cols-2 gap-2">
                                   <button
                                     onClick={() => handleClaimChallenge(skillChallenge)}
-                                    className="bg-emerald-650 hover:bg-emerald-700 text-white font-extrabold text-[11px] py-2.5 rounded-xl text-center shadow cursor-pointer transition-all active:scale-99"
+                                    className="bg-emerald-650 hover:bg-emerald-700 text-white font-extrabold text-xs py-2.5 rounded-xl text-center shadow cursor-pointer transition-all active:scale-99"
                                   >
                                     👑 领用为必做目标
                                   </button>
                                   <button
                                     onClick={() => setSkillChallenge(null)}
-                                    className="border border-slate-200 hover:bg-slate-50 text-slate-500 font-bold text-[11px] py-2.5 rounded-xl text-center cursor-pointer transition-colors"
+                                    className="border border-slate-200 hover:bg-slate-50 text-slate-500 font-bold text-xs py-2.5 rounded-xl text-center cursor-pointer transition-colors"
                                   >
                                     重新探索
                                   </button>
@@ -2864,12 +2832,12 @@ export default function App() {
                               <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4 text-left">
                                 <div className="text-center space-y-1 mb-2">
                                   <h3 className="text-sm font-black text-slate-800">终身学习里程碑规划</h3>
-                                  <p className="text-[10.5px] text-slate-400">输入想学习的硬核领域，大模型帮您合理分阶</p>
+                                  <p className="text-xs text-slate-400">输入想学习的硬核领域，大模型帮您合理分阶</p>
                                 </div>
 
                                 <div className="space-y-3 text-xs">
                                   <div className="space-y-1">
-                                    <label className="text-[10px] text-slate-505 font-bold">我想精进的知识领域 / 技能</label>
+                                    <label className="text-xs text-slate-505 font-bold">我想精进的知识领域 / 技能</label>
                                     <input
                                       type="text"
                                       placeholder="例如：量子力学基础、Rust后端编程、古典钢琴..."
@@ -2880,7 +2848,7 @@ export default function App() {
                                   </div>
 
                                   <div className="space-y-1">
-                                    <label className="text-[10px] text-slate-505 font-bold">建议规划周期 (天数)</label>
+                                    <label className="text-xs text-slate-505 font-bold">建议规划周期 (天数)</label>
                                     <div className="relative">
                                       <input
                                         type="number"
@@ -2897,7 +2865,7 @@ export default function App() {
 
                                 <button
                                   onClick={handleGetLearningPath}
-                                  className="w-full bg-slate-900 hover:bg-slate-950 text-white font-black py-3 rounded-xl tracking-wider text-xs shadow cursor-pointer transition-all active:scale-99"
+                                  className="w-full bg-indigo-605 hover:bg-indigo-700 text-white font-black py-3 rounded-xl tracking-wider text-xs shadow cursor-pointer transition-all active:scale-99"
                                 >
                                   🎓 生成里程碑自学路线
                                 </button>
@@ -2905,7 +2873,7 @@ export default function App() {
                             ) : (
                               <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-md text-left space-y-5">
                                 <div className="border-b pb-2">
-                                  <span className="text-[9px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-extrabold uppercase">
+                                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-extrabold uppercase">
                                     学习周期: {learningPath.estimatedDays}
                                   </span>
                                   <h3 className="text-sm font-black text-slate-805 mt-1.5">
@@ -2915,11 +2883,11 @@ export default function App() {
 
                                 <div className="grid grid-cols-2 gap-2 text-center text-xs">
                                   <div className="bg-blue-50/50 p-2.5 rounded-xl border border-blue-100/50">
-                                    <div className="text-[9px] text-blue-650 font-bold mb-0.5">规划总天数</div>
+                                    <div className="text-xs text-blue-650 font-bold mb-0.5">规划总天数</div>
                                     <div className="font-black text-blue-950 truncate">{(learningPath.totalDays || 30)} 天</div>
                                   </div>
                                   <div className="bg-indigo-50/50 p-2.5 rounded-xl border border-indigo-100/50">
-                                    <div className="text-[9px] text-indigo-605 font-bold mb-0.5">里程碑阶段数</div>
+                                    <div className="text-xs text-indigo-605 font-bold mb-0.5">里程碑阶段数</div>
                                     <div className="font-black text-indigo-950 truncate">{(learningPath.milestonesCount || 4)} 阶段</div>
                                   </div>
                                 </div>
@@ -2939,20 +2907,20 @@ export default function App() {
 
                                       <div className="flex justify-between items-center text-xs">
                                         <p className="font-black text-slate-850">{ml.phase} · {ml.title}</p>
-                                        <span className="text-[9px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold font-mono">
+                                        <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold font-mono">
                                           {ml.timeRange}
                                         </span>
                                       </div>
 
-                                      <p className="text-[11px] text-slate-600 leading-relaxed font-semibold">
+                                      <p className="text-xs text-slate-600 leading-relaxed font-semibold">
                                         {ml.content}
                                       </p>
 
-                                      <div className="text-[10px] space-y-0.5">
+                                      <div className="text-xs space-y-0.5">
                                         <span className="text-slate-450 font-bold block">📚 推荐研究资料：</span>
                                         <div className="flex flex-wrap gap-1 pt-0.5">
                                           {ml.recommendedResources.map((res, rIdx) => (
-                                            <span key={rIdx} className="bg-slate-50 border text-slate-605 px-1.5 py-0.5 rounded text-[9.5px] font-semibold">
+                                            <span key={rIdx} className="bg-slate-50 border text-slate-605 px-1.5 py-0.5 rounded text-xs font-semibold">
                                               {res}
                                             </span>
                                           ))}
@@ -2964,7 +2932,7 @@ export default function App() {
 
                                 <button
                                   onClick={() => setLearningPath(null)}
-                                  className="w-full border border-slate-200 hover:bg-slate-50 text-slate-500 font-bold py-2 rounded-xl text-[11px] transition-colors cursor-pointer text-center"
+                                  className="w-full border border-slate-200 hover:bg-slate-50 text-slate-500 font-bold py-2 rounded-xl text-xs transition-colors cursor-pointer text-center"
                                 >
                                   🗑️ 重新规划路线
                                 </button>
@@ -2996,12 +2964,12 @@ export default function App() {
                           <Clock size={16} className="text-slate-900" />
                           <h2 className="text-sm font-black text-slate-900 tracking-tight">制定下一个必做目标 & 周期时刻</h2>
                         </div>
-                        <p className="text-[10.5px] text-slate-400 mt-1">设置约束条件和每日计划，自律方可随之而生。</p>
+                        <p className="text-xs text-slate-400 mt-1">设置约束条件和每日计划，自律方可随之而生。</p>
                       </div>
 
                       <form onSubmit={handleAddNewTask} className="space-y-4 text-xs text-slate-800">
                         <div className="space-y-1">
-                          <label className="text-[11px] text-slate-500 font-bold">
+                          <label className="text-xs text-slate-500 font-bold">
                             选择承诺周期 <span className="text-rose-500">*</span>
                           </label>
                           <div className="grid grid-cols-3 gap-2">
@@ -3015,20 +2983,18 @@ export default function App() {
                                 type="button"
                                 onClick={() => setNewTaskPeriod(o.id as any)}
                                 className={`p-2.5 border rounded-xl cursor-pointer text-center space-y-0.5 transition-all ${
-                                  newTaskPeriod === o.id
-                                    ? "bg-slate-900 border-slate-900 text-white font-extrabold"
-                                    : "bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100"
+                                  newTaskPeriod === o.id ? "bg-indigo-600 border-indigo-600 text-white font-bold" : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                                 }`}
                               >
-                                <div className="font-bold text-[11px]">{o.label}</div>
-                                <div className="text-[8.5px] opacity-80">{o.desc}</div>
+                                <div className="font-bold text-xs">{o.label}</div>
+                                <div className="text-xs opacity-80">{o.desc}</div>
                               </button>
                             ))}
                           </div>
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-[11px] text-slate-500 font-bold">
+                          <label className="text-xs text-slate-500 font-bold">
                             承诺誓愿行动细节 <span className="text-rose-500">*</span>
                           </label>
                           <input
@@ -3037,12 +3003,12 @@ export default function App() {
                             placeholder="例如：早起半小时晨跑2英里、看文献2页并复盘..."
                             value={newTaskText}
                             onChange={(e) => setNewTaskText(e.target.value)}
-                            className="w-full border border-slate-205 rounded-xl p-3 bg-slate-50 text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                            className="w-full border border-slate-200 rounded-xl p-3 bg-slate-50 text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-500"
                           />
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-[11px] text-slate-500 font-bold">
+                          <label className="text-xs text-slate-500 font-bold">
                             必做执行时刻或时限 (选填)
                           </label>
                           <input
@@ -3050,16 +3016,16 @@ export default function App() {
                             placeholder="例如：07:30、22:00、睡前、甚至用时1小时"
                             value={newTaskTime}
                             onChange={(e) => setNewTaskTime(e.target.value)}
-                            className="w-full border border-slate-205 rounded-xl p-3 bg-white text-slate-800 focus:outline-none"
+                            className="w-full border border-slate-200 rounded-xl p-3 bg-white text-slate-800 focus:outline-none"
                           />
-                          <p className="text-[8.5px] text-slate-400 leading-normal">
+                          <p className="text-xs text-slate-400 leading-normal">
                             为自律行动锚定准确的强制启动时钟，不留拖延和迟疑。
                           </p>
                         </div>
 
                         <button
                           type="submit"
-                          className="w-full bg-slate-900 hover:bg-slate-950 text-white font-black py-3 rounded-xl tracking-wider text-xs shadow cursor-pointer active:scale-99 transition-transform"
+                          className="w-full bg-indigo-605 hover:bg-indigo-700 text-white font-black py-3 rounded-xl tracking-wider text-xs shadow cursor-pointer active:scale-99 transition-transform"
                         >
                           🎉 保存在册并返回主页
                         </button>
@@ -3069,13 +3035,13 @@ export default function App() {
 
                     {/* Manage & Clear Column lists */}
                     <div className="bg-slate-50 border border-slate-200/60 p-4 rounded-2xl space-y-3">
-                      <h4 className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">已有承诺管理一览</h4>
+                      <h4 className="text-xs text-slate-500 font-bold uppercase tracking-wider">已有承诺管理一览</h4>
                       <div className="space-y-1.5 max-h-56 overflow-y-auto">
                         {mustDoTasks.map((t) => (
                           <div key={t.id} className="bg-white border rounded-lg p-2.5 flex items-center justify-between text-xs font-semibold text-slate-700">
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-slate-800">{t.text}</p>
-                              <p className="text-[9px] text-slate-400">
+                              <p className="text-xs text-slate-400">
                                 周期: {t.period === "today" ? "今日" : t.period === "week" ? "每周" : "本月"} | 约束点: {t.time || "⏰ 全天"}
                               </p>
                             </div>
@@ -3115,7 +3081,7 @@ export default function App() {
                             className="h-16 w-16 rounded-full object-cover border-2 border-slate-900 group-hover:scale-102 transition-transform shadow-md"
                           />
                         </div>
-                        <p className="text-[10px] text-slate-400 font-semibold mt-1">自律头像预览</p>
+                        <p className="text-xs text-slate-400 font-semibold mt-1">自律头像预览</p>
                         
                         {/* Selector presets */}
                         <div className="flex gap-2.5 mt-2.5 select-none">
@@ -3137,18 +3103,18 @@ export default function App() {
                       <div className="grid grid-cols-2 gap-3.5 text-xs text-slate-800 text-left">
                         
                         <div className="space-y-1">
-                          <label className="text-[11px] text-slate-500 font-bold">我的修行化名</label>
+                          <label className="text-xs text-slate-500 font-bold">我的修行化名</label>
                           <input
                             type="text"
                             required
                             value={settingsName}
                             onChange={(e) => setSettingsName(e.target.value)}
-                            className="w-full border border-slate-205 rounded-xl p-2.5 focus:outline-none bg-slate-50 font-bold text-slate-800"
+                            className="w-full border border-slate-200 rounded-xl p-2.5 focus:outline-none bg-slate-50 font-bold text-slate-800"
                           />
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-[11px] text-slate-400 font-bold uppercase">账户 ID 徽章</label>
+                          <label className="text-xs text-slate-400 font-bold uppercase">账户 ID 徽章</label>
                           <input
                             type="text"
                             disabled
@@ -3169,11 +3135,11 @@ export default function App() {
 
                         <div className="grid grid-cols-2 gap-3.5">
                           <div className="space-y-1">
-                            <label className="text-[10px] text-slate-500 font-bold uppercase">首选 AI 渠道</label>
+                            <label className="text-xs text-slate-500 font-bold uppercase">首选 AI 渠道</label>
                             <select
                               value={settingsProvider}
                               onChange={(e) => setSettingsProvider(e.target.value)}
-                              className="w-full border border-slate-205 rounded-xl p-2.5 bg-slate-50 focus:outline-none font-semibold text-slate-800"
+                              className="w-full border border-slate-200 rounded-xl p-2.5 bg-slate-50 focus:outline-none font-semibold text-slate-800"
                             >
                               <option value="SiliconFlow">硅基流动 SiliconFlow</option>
                               <option value="Minimax">Minimax (名之境)</option>
@@ -3184,18 +3150,18 @@ export default function App() {
                           </div>
 
                           <div className="space-y-1">
-                            <label className="text-[10px] text-slate-500 font-bold uppercase">Cloudflare Worker 地址</label>
+                            <label className="text-xs text-slate-500 font-bold uppercase">Cloudflare Worker 地址</label>
                             <input
                               type="text"
                               placeholder="https://your-worker.workers.dev"
                               value={workerApiUrl}
                               onChange={(e) => setWorkerApiUrl(e.target.value)}
-                              className="w-full border border-slate-205 rounded-xl p-2.5 bg-slate-50 font-mono text-xs focus:outline-none text-slate-800"
+                              className="w-full border border-slate-200 rounded-xl p-2.5 bg-slate-50 font-mono text-xs focus:outline-none text-slate-800"
                             />
                           </div>
                         </div>
 
-                        <p className="text-[9.5px] text-slate-400 leading-normal bg-indigo-50/40 p-2.5 rounded-lg border border-indigo-100/60 font-medium">
+                        <p className="text-xs text-slate-400 leading-normal bg-indigo-50/40 p-2.5 rounded-lg border border-indigo-100/60 font-medium">
                           💡 部署提醒：请将您的 API Keys 安全地使用 Wrangler Secrets 配置挂载在 Cloudflare Worker 上。在此处填入部署地址和首选提供商即可。
                         </p>
 
@@ -3204,7 +3170,7 @@ export default function App() {
                       <div className="space-y-2 pt-2 border-t border-slate-100">
                         <button
                           type="submit"
-                          className="w-full bg-slate-900 hover:bg-slate-950 text-white font-bold py-2.5 rounded-xl text-xs tracking-wider transition-colors cursor-pointer shadow-sm"
+                          className="w-full bg-indigo-605 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs tracking-wider transition-colors cursor-pointer shadow-sm"
                         >
                           💾 保存并持久化本页轮廓设置
                         </button>
@@ -3230,15 +3196,15 @@ export default function App() {
                           className="p-3 border border-slate-200 hover:bg-slate-50 rounded-xl flex flex-col items-center justify-center text-center space-y-1 text-slate-705 transition-colors cursor-pointer active:scale-[0.99]"
                         >
                           <ArrowDownToLine size={20} className="text-slate-700 animate-bounce" />
-                          <span className="text-[11px] font-extrabold text-slate-800">一键导出 JSON</span>
-                          <span className="text-[8.5px] text-slate-405">本地安全离线打包</span>
+                          <span className="text-xs font-extrabold text-slate-800">一键导出 JSON</span>
+                          <span className="text-xs text-slate-405">本地安全离线打包</span>
                         </button>
 
                         {/* Import JSON */}
                         <div className="relative p-3 border border-slate-200 hover:bg-slate-50 rounded-xl flex flex-col items-center justify-center text-center space-y-1 text-slate-705 transition-colors cursor-pointer active:scale-[0.99]">
                           <ArrowUpToLine size={20} className="text-slate-700" />
-                          <span className="text-[11px] font-extrabold text-slate-800">同步导入备份</span>
-                          <span className="text-[8.5px] text-slate-405">解析还原打卡行囊</span>
+                          <span className="text-xs font-extrabold text-slate-800">同步导入备份</span>
+                          <span className="text-xs text-slate-405">解析还原打卡行囊</span>
                           <input
                             type="file"
                             accept=".json"
@@ -3259,20 +3225,20 @@ export default function App() {
                           <span className="text-sm">📱</span>
                           <span>iOS 苹果健康快捷指令联动</span>
                         </h4>
-                        <span className="text-[8px] bg-indigo-50 text-indigo-700 font-extrabold px-2 py-0.5 rounded-full border border-indigo-100 uppercase">
+                        <span className="text-xs bg-indigo-50 text-indigo-700 font-extrabold px-2 py-0.5 rounded-full border border-indigo-100 uppercase">
                           快捷接入
                         </span>
                       </div>
 
-                      <div className="space-y-3.5 text-left text-[11px] text-slate-600 leading-normal">
+                      <div className="space-y-3.5 text-left text-xs text-slate-600 leading-normal">
                         <p className="font-semibold text-slate-700">
                           支持通过苹果“快捷指令” App 从苹果健康中一键读取您今日的 <strong className="text-slate-950 font-bold">睡眠、运动、喝水量、体重</strong>，并静默同步导入云端！
                         </p>
                         
-                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2.5 font-mono text-[10px]">
+                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2.5 font-mono text-xs">
                           {/* Endpoint */}
                           <div className="space-y-1">
-                            <span className="text-[9.5px] font-bold text-slate-400 block uppercase font-sans">1. 快捷指令请求 URL (POST)</span>
+                            <span className="text-xs font-bold text-slate-400 block uppercase font-sans">1. 快捷指令请求 URL (POST)</span>
                             <div className="flex items-center gap-2 bg-white border border-slate-200 p-2 rounded-lg justify-between">
                               <span className="truncate select-all text-slate-800 font-bold">
                                 {`${workerApiUrl.replace(/\/$/, "")}/api/shortcuts/import`}
@@ -3283,7 +3249,7 @@ export default function App() {
                                   navigator.clipboard.writeText(`${workerApiUrl.replace(/\/$/, "")}/api/shortcuts/import`);
                                   alert("📋 快捷指令导入 URL 已成功复制到剪贴板！");
                                 }}
-                                className="text-[9.5px] text-indigo-600 font-black cursor-pointer shrink-0 hover:underline hover:text-indigo-800"
+                                className="text-xs text-indigo-600 font-black cursor-pointer shrink-0 hover:underline hover:text-indigo-800"
                               >
                                 复制
                               </button>
@@ -3292,7 +3258,7 @@ export default function App() {
 
                           {/* Authorization Token */}
                           <div className="space-y-1">
-                            <span className="text-[9.5px] font-bold text-slate-400 block uppercase font-sans">2. 请求头 Authorization 字段</span>
+                            <span className="text-xs font-bold text-slate-400 block uppercase font-sans">2. 请求头 Authorization 字段</span>
                             <div className="flex items-center gap-2 bg-white border border-slate-200 p-2 rounded-lg justify-between">
                               <span className="truncate select-all text-slate-800 font-bold">
                                 {`Bearer ${localStorage.getItem("min_cf_token") || "您尚未在云端登录"}`}
@@ -3308,7 +3274,7 @@ export default function App() {
                                   navigator.clipboard.writeText(`Bearer ${token}`);
                                   alert("📋 Authorization Bearer 令牌已复制！请直接作为快捷指令 Request Header 填入。");
                                 }}
-                                className="text-[9.5px] text-indigo-600 font-black cursor-pointer shrink-0 hover:underline hover:text-indigo-800"
+                                className="text-xs text-indigo-600 font-black cursor-pointer shrink-0 hover:underline hover:text-indigo-800"
                               >
                                 复制
                               </button>
@@ -3317,30 +3283,30 @@ export default function App() {
 
                           {/* 专属快捷指令一键配置下载 */}
                           <div className="space-y-1 pt-1">
-                            <span className="text-[9.5px] font-bold text-slate-400 block uppercase font-sans">3. 专属快捷指令一键配置下载</span>
+                            <span className="text-xs font-bold text-slate-400 block uppercase font-sans">3. 专属快捷指令一键配置下载</span>
                             <button
                               type="button"
                               onClick={handleDownloadShortcut}
-                              className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-2.5 px-4 rounded-xl shadow-sm transition-all text-[11px] cursor-pointer animate-pulse-subtle"
+                              className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-2.5 px-4 rounded-xl shadow-sm transition-all text-xs cursor-pointer animate-pulse-subtle"
                             >
                               <span>📥 下载专属配置快捷指令 (.shortcut)</span>
                             </button>
-                            <span className="text-[9px] text-slate-400 block font-sans text-center mt-1 leading-snug">
+                            <span className="text-xs text-slate-400 block font-sans text-center mt-1 leading-snug">
                               💡 <strong>小提示</strong>：直接下载的本地文件属于“未签名快捷指令”。Mac 电脑双击可直接免配导入运行。如果是 iOS 15+ 的 iPhone，直接双击可能会提示“未签名/不受信任无法打开”，此时更推荐您将原始指令分享生成官方 <strong>iCloud 链接</strong>，并配合第 2 步的 <strong>Token 复制</strong> 进行无报错快捷导入！
                             </span>
                           </div>
                         </div>
 
                         {/* Usage instruction */}
-                        <div className="space-y-2 text-[10.5px]">
+                        <div className="space-y-2 text-xs">
                           <div className="flex items-start gap-1">
                             <span className="text-xs text-indigo-600 font-bold mt-0.5">&bull;</span>
-                            <p><strong>指令配置方法</strong>：在快捷指令“获取 URL 内容”操作中，设置方法为 <strong className="text-slate-900 font-black">POST</strong>，添加 Header <code className="bg-slate-100 p-0.5 rounded font-mono text-[10px]">Authorization</code>，Value 填入复制的 Bearer 令牌。</p>
+                            <p><strong>指令配置方法</strong>：在快捷指令“获取 URL 内容”操作中，设置方法为 <strong className="text-slate-900 font-black">POST</strong>，添加 Header <code className="bg-slate-100 p-0.5 rounded font-mono text-xs">Authorization</code>，Value 填入复制的 Bearer 令牌。</p>
                           </div>
                           <div className="flex items-start gap-1">
                             <span className="text-xs text-indigo-600 font-bold mt-0.5">&bull;</span>
                             <p><strong>请求体配置 (JSON)</strong>：在请求体中，以 JSON 键值对传递您想导入的数据。例如：
-                              <code className="block bg-slate-100 p-2 rounded font-mono text-[9px] mt-1 whitespace-pre">
+                              <code className="block bg-slate-100 p-2 rounded font-mono text-xs mt-1 whitespace-pre">
 {`{
   "water": { "amount": 250 },
   "weight": { "weight": 70.5 },
@@ -3369,7 +3335,7 @@ export default function App() {
                 )}
 
                 {syncStatus && (
-                  <p className="text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-100 p-2.5 rounded-xl font-bold text-center select-none shadow-xs mt-3">
+                  <p className="text-xs text-emerald-800 bg-emerald-50 border border-emerald-100 p-2.5 rounded-xl font-bold text-center select-none shadow-xs mt-3">
                     {syncStatus}
                   </p>
                 )}
@@ -3385,8 +3351,8 @@ export default function App() {
               
               <button
                 onClick={() => setActiveTab("home")}
-                className={`py-2 text-[10.5px] rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
-                  activeTab === "home" ? "bg-slate-900 text-white font-extrabold" : "text-slate-500 hover:bg-slate-50"
+                className={`py-2 text-xs rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
+                  activeTab === "home" ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-100/40 shadow-xs" : "text-slate-500 hover:bg-slate-50"
                 }`}
               >
                 <Award size={16} />
@@ -3395,8 +3361,8 @@ export default function App() {
 
               <button
                 onClick={() => setActiveTab("ai_studio")}
-                className={`py-2 text-[10.5px] rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
-                  activeTab === "ai_studio" ? "bg-slate-900 text-white font-extrabold" : "text-slate-500 hover:bg-slate-50"
+                className={`py-2 text-xs rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
+                  activeTab === "ai_studio" ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-100/40 shadow-xs" : "text-slate-500 hover:bg-slate-50"
                 }`}
               >
                 <Sparkles size={16} />
@@ -3405,8 +3371,8 @@ export default function App() {
 
               <button
                 onClick={() => setActiveTab("mustdo")}
-                className={`py-2 text-[10.5px] rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
-                  activeTab === "mustdo" ? "bg-slate-900 text-white font-extrabold" : "text-slate-500 hover:bg-slate-50"
+                className={`py-2 text-xs rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
+                  activeTab === "mustdo" ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-100/40 shadow-xs" : "text-slate-500 hover:bg-slate-50"
                 }`}
               >
                 <Clock size={16} />
@@ -3415,8 +3381,8 @@ export default function App() {
 
               <button
                 onClick={() => setActiveTab("settings")}
-                className={`py-2 text-[10.5px] rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
-                  activeTab === "settings" ? "bg-slate-900 text-white font-extrabold" : "text-slate-500 hover:bg-slate-50"
+                className={`py-2 text-xs rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
+                  activeTab === "settings" ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-100/40 shadow-xs" : "text-slate-500 hover:bg-slate-50"
                 }`}
               >
                 <Settings size={16} />

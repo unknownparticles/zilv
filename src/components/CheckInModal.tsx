@@ -268,7 +268,7 @@ export default function CheckInModal({
       {/* Dim backdrop */}
       <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs" onClick={onClose} />
 
-      <div className="relative bg-white border border-slate-205 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden z-10 flex flex-col max-h-[90vh]">
+      <div className="relative bg-white border border-slate-200 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden z-10 flex flex-col max-h-[90vh]">
         
         {/* Header bar */}
         <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50 select-none">
@@ -285,8 +285,8 @@ export default function CheckInModal({
         <div className="grid grid-cols-6 border-b border-slate-100 bg-white p-1 gap-0.5 select-none text-center">
           <button
             onClick={() => { setActiveCheckTab("sleep"); setErrorText(""); }}
-            className={`py-2 text-[10px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
-              activeCheckTab === "sleep" ? "bg-slate-900 text-white font-bold" : "text-slate-500 hover:bg-slate-100"
+            className={`py-2 text-xs rounded-xl cursor-pointer flex flex-col items-center gap-1 transition-all ${
+              activeCheckTab === "sleep" ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-150/40 shadow-xs" : "text-slate-500 hover:bg-slate-100"
             }`}
           >
             <Moon size={13} />
@@ -295,8 +295,8 @@ export default function CheckInModal({
 
           <button
             onClick={() => { setActiveCheckTab("diet"); setErrorText(""); }}
-            className={`py-2 text-[10px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
-              activeCheckTab === "diet" ? "bg-slate-900 text-white font-bold" : "text-slate-500 hover:bg-slate-100"
+            className={`py-2 text-xs rounded-xl cursor-pointer flex flex-col items-center gap-1 transition-all ${
+              activeCheckTab === "diet" ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-150/40 shadow-xs" : "text-slate-500 hover:bg-slate-100"
             }`}
           >
             <Utensils size={13} />
@@ -305,8 +305,8 @@ export default function CheckInModal({
 
           <button
             onClick={() => { setActiveCheckTab("workout"); setErrorText(""); }}
-            className={`py-2 text-[10px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
-              activeCheckTab === "workout" ? "bg-slate-900 text-white font-bold" : "text-slate-500 hover:bg-slate-100"
+            className={`py-2 text-xs rounded-xl cursor-pointer flex flex-col items-center gap-1 transition-all ${
+              activeCheckTab === "workout" ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-150/40 shadow-xs" : "text-slate-500 hover:bg-slate-100"
             }`}
           >
             <Dumbbell size={13} />
@@ -315,8 +315,8 @@ export default function CheckInModal({
 
           <button
             onClick={() => { setActiveCheckTab("study"); setErrorText(""); }}
-            className={`py-2 text-[10px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
-              activeCheckTab === "study" ? "bg-slate-900 text-white font-bold" : "text-slate-500 hover:bg-slate-100"
+            className={`py-2 text-xs rounded-xl cursor-pointer flex flex-col items-center gap-1 transition-all ${
+              activeCheckTab === "study" ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-150/40 shadow-xs" : "text-slate-500 hover:bg-slate-100"
             }`}
           >
             <BookOpen size={13} />
@@ -325,8 +325,8 @@ export default function CheckInModal({
 
           <button
             onClick={() => { setActiveCheckTab("water"); setErrorText(""); }}
-            className={`py-2 text-[10px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
-              activeCheckTab === "water" ? "bg-slate-900 text-white font-bold" : "text-slate-500 hover:bg-slate-100"
+            className={`py-2 text-xs rounded-xl cursor-pointer flex flex-col items-center gap-1 transition-all ${
+              activeCheckTab === "water" ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-150/40 shadow-xs" : "text-slate-500 hover:bg-slate-100"
             }`}
           >
             <Droplet size={13} />
@@ -335,8 +335,8 @@ export default function CheckInModal({
 
           <button
             onClick={() => { setActiveCheckTab("weight"); setErrorText(""); }}
-            className={`py-2 text-[10px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
-              activeCheckTab === "weight" ? "bg-slate-900 text-white font-bold" : "text-slate-500 hover:bg-slate-100"
+            className={`py-2 text-xs rounded-xl cursor-pointer flex flex-col items-center gap-1 transition-all ${
+              activeCheckTab === "weight" ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-150/40 shadow-xs" : "text-slate-500 hover:bg-slate-100"
             }`}
           >
             <Scale size={13} />
@@ -358,7 +358,7 @@ export default function CheckInModal({
                   ✓
                 </div>
                 <p className="text-xs font-bold text-slate-800">{successMsg}</p>
-                <p className="text-[10px] text-slate-400">正在合拢打卡台并保存...</p>
+                <p className="text-xs text-slate-400">正在合拢打卡台并保存...</p>
               </motion.div>
             ) : (
               <motion.div
@@ -373,29 +373,29 @@ export default function CheckInModal({
                   <form onSubmit={handleSleepSubmit} className="space-y-4">
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1">
-                        <label className="text-[11px] text-slate-500 font-bold">上床入睡点</label>
+                        <label className="text-xs text-slate-500 font-semibold">上床入睡点</label>
                         <input
                           type="time"
                           required
                           value={sleepTime}
                           onChange={(e) => setSleepTime(e.target.value)}
-                          className="w-full text-xs font-semibold border border-slate-205 rounded-lg p-2.5 bg-slate-50 text-slate-800 focus:outline-none"
+                          className="w-full text-sm font-medium border border-slate-200 rounded-lg p-2.5 bg-slate-50 text-slate-800 focus:outline-none"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[11px] text-slate-500 font-bold">清晨晨醒点</label>
+                        <label className="text-xs text-slate-500 font-semibold">清晨晨醒点</label>
                         <input
                           type="time"
                           required
                           value={wakeTime}
                           onChange={(e) => setWakeTime(e.target.value)}
-                          className="w-full text-xs font-semibold border border-slate-205 rounded-lg p-2.5 bg-slate-50 text-slate-800 focus:outline-none"
+                          className="w-full text-sm font-medium border border-slate-200 rounded-lg p-2.5 bg-slate-50 text-slate-800 focus:outline-none"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-1.5 select-none">
-                      <label className="text-[11px] text-slate-500 font-bold">睡眠主观评分</label>
+                      <label className="text-xs text-slate-500 font-semibold">睡眠主观评分</label>
                       <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 p-2 rounded-lg justify-center">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
@@ -406,7 +406,7 @@ export default function CheckInModal({
                           >
                             <Star
                               size={22}
-                              className={star <= sleepQuality ? "fill-amber-450 stroke-amber-500" : "stroke-slate-300"}
+                              className={star <= sleepQuality ? "fill-amber-400 stroke-amber-500" : "stroke-slate-300"}
                             />
                           </button>
                         ))}
@@ -414,19 +414,19 @@ export default function CheckInModal({
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-[11px] text-slate-500 font-bold">夜梦小记 / 觉察反馈</label>
+                      <label className="text-xs text-slate-500 font-semibold">夜梦小记 / 觉察反馈</label>
                       <input
                         type="text"
                         placeholder="例如：睡前没有看手机，睡眠很深沉..."
                         value={sleepNote}
                         onChange={(e) => setSleepNote(e.target.value)}
-                        className="w-full text-xs border border-slate-205 rounded-lg p-2.5 bg-slate-50 text-slate-800 focus:outline-none"
+                        className="w-full text-sm border border-slate-200 rounded-lg p-2.5 bg-slate-50 text-slate-800 focus:outline-none"
                       />
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full bg-slate-900 hover:bg-slate-950 text-white font-bold py-2.5 rounded-lg text-xs tracking-wide transition-all shadow cursor-pointer active:scale-[0.99]"
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors shadow-sm tracking-wide transition-all shadow cursor-pointer active:scale-[0.99]"
                     >
                       提交作息打卡记录
                     </button>
@@ -442,14 +442,14 @@ export default function CheckInModal({
                         <button
                           type="button"
                           onClick={() => setMealNumber(Math.max(1, mealNumber - 1))}
-                          className="px-2 py-0.5 text-[10px] font-bold bg-white border rounded text-slate-600 hover:bg-slate-100 cursor-pointer"
+                          className="px-2 py-0.5 text-xs font-bold bg-white border rounded text-slate-600 hover:bg-slate-100 cursor-pointer"
                         >
                           -
                         </button>
                         <button
                           type="button"
                           onClick={() => setMealNumber(mealNumber + 1)}
-                          className="px-2 py-0.5 text-[10px] font-bold bg-white border rounded text-slate-600 hover:bg-slate-100 cursor-pointer"
+                          className="px-2 py-0.5 text-xs font-bold bg-white border rounded text-slate-600 hover:bg-slate-100 cursor-pointer"
                         >
                           +
                         </button>
@@ -461,15 +461,15 @@ export default function CheckInModal({
                       {isAnalyzingImage ? (
                         <div className="py-2.5 flex flex-col items-center gap-1.5">
                           <Loader2 size={20} className="text-slate-905 animate-spin" />
-                          <span className="text-[10px] font-bold text-slate-600 animate-pulse">
+                          <span className="text-xs font-semibold text-slate-600 animate-pulse">
                             Gemini 视觉神经网络正在扫描餐盘成分...
                           </span>
                         </div>
                       ) : (
                         <div className="py-2 flex flex-col items-center gap-1 select-none">
                           <Camera size={18} className="text-slate-400" />
-                          <p className="text-[10.5px] font-semibold text-slate-700">📸 拍照/上传食物图片触发智能识别</p>
-                          <p className="text-[8.5px] text-slate-400">我们将自动识别菜名和膳食信息填入下方</p>
+                          <p className="text-xs font-semibold text-slate-700">📸 拍照/上传食物图片触发智能识别</p>
+                          <p className="text-xs text-slate-400">我们将自动识别菜名和膳食信息填入下方</p>
                         </div>
                       )}
                       
@@ -483,45 +483,45 @@ export default function CheckInModal({
                     </div>
 
                     {errorText && (
-                      <div className="p-2.5 bg-rose-50 border border-rose-100 rounded-lg text-[10px] text-rose-600 font-semibold flex items-start gap-1 select-none">
+                      <div className="p-2.5 bg-rose-50 border border-rose-100 rounded-lg text-xs text-rose-600 font-semibold flex items-start gap-1 select-none">
                         <span className="shrink-0 mt-0.5">⚠️</span>
                         <span>{errorText}</span>
                       </div>
                     )}
 
                     {apiSuccessInfo && (
-                      <div className="p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg text-[10.5px] text-emerald-800 flex items-center gap-1">
+                      <div className="p-2.5 bg-emerald-50 border border-emerald-100 rounded-lg text-xs text-emerald-700 flex items-center gap-1">
                         <Check size={12} className="stroke-[3]" />
                         <span>{apiSuccessInfo}</span>
                       </div>
                     )}
 
                     <div className="space-y-1">
-                      <label className="text-[11px] text-slate-500 font-bold">食物具体名称与份量 <span className="text-rose-500">*</span></label>
+                      <label className="text-xs text-slate-500 font-semibold">食物具体名称与份量 <span className="text-rose-500">*</span></label>
                       <textarea
                         required
                         rows={2}
                         placeholder="例如：生煎鸡胸肉120克，炒西兰花一碗，紫米饭一小碗..."
                         value={dietText}
                         onChange={(e) => setDietText(e.target.value)}
-                        className="w-full text-xs border border-slate-205 rounded-lg p-2.5 focus:outline-none"
+                        className="w-full text-sm border border-slate-200 rounded-lg p-2.5 focus:outline-none"
                       />
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-[11px] text-slate-500 font-bold">餐饮备注或油盐控糖评价</label>
+                      <label className="text-xs text-slate-500 font-semibold">餐饮备注或油盐控糖评价</label>
                       <input
                         type="text"
                         placeholder="例如：油放得少，膳食蛋白质充沛"
                         value={dietNote}
                         onChange={(e) => setDietNote(e.target.value)}
-                        className="w-full text-xs border border-slate-205 rounded-lg p-2.5 focus:outline-none"
+                        className="w-full text-sm border border-slate-200 rounded-lg p-2.5 focus:outline-none"
                       />
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full bg-slate-900 hover:bg-slate-950 text-white font-bold py-2.5 rounded-lg text-xs tracking-wide transition-all shadow cursor-pointer active:scale-[0.99]"
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors shadow-sm tracking-wide transition-all shadow cursor-pointer active:scale-[0.99]"
                     >
                       提交本次饮食打卡 (保存第 {mealNumber} 顿)
                     </button>
@@ -532,14 +532,14 @@ export default function CheckInModal({
                 {activeCheckTab === "workout" && (
                   <form onSubmit={handleWorkoutSubmit} className="space-y-4">
                     <div className="space-y-1">
-                      <label className="text-[11px] text-slate-500 font-bold">运动项目 / 主题 <span className="text-rose-500">*</span></label>
+                      <label className="text-xs text-slate-500 font-semibold">运动项目 / 主题 <span className="text-rose-500">*</span></label>
                       <input
                         type="text"
                         required
                         placeholder="例如：户外有氧慢跑、哑铃无氧上肢训练、瑜伽..."
                         value={workoutType}
                         onChange={(e) => setWorkoutType(e.target.value)}
-                        className="w-full text-xs border border-slate-205 rounded-lg p-2.5 Focus:outline-none bg-slate-50 text-slate-800"
+                        className="w-full text-sm border border-slate-200 rounded-lg p-2.5 Focus:outline-none bg-slate-50 text-slate-800"
                       />
                       
                       {/* Popular tags */}
@@ -549,7 +549,7 @@ export default function CheckInModal({
                             key={tag}
                             type="button"
                             onClick={() => setWorkoutType(tag)}
-                            className="px-2 py-1 text-[9.5px] border border-slate-200 rounded-full hover:bg-slate-50 text-slate-600 cursor-pointer transition-colors"
+                            className="px-2.5 py-1 text-xs border border-slate-200 rounded-full hover:bg-slate-100/70 text-slate-650 cursor-pointer transition-colors"
                           >
                             + {tag}
                           </button>
@@ -558,7 +558,7 @@ export default function CheckInModal({
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-[11px] text-slate-500 font-bold">运动持续时长 (单位：分钟) <span className="text-rose-500">*</span></label>
+                      <label className="text-xs text-slate-500 font-semibold">运动持续时长 (单位：分钟) <span className="text-rose-500">*</span></label>
                       <div className="relative">
                         <input
                           type="number"
@@ -567,7 +567,7 @@ export default function CheckInModal({
                           placeholder="例如：30"
                           value={workoutDuration}
                           onChange={(e) => setWorkoutDuration(e.target.value ? Number(e.target.value) : "")}
-                          className="w-full text-xs border border-slate-205 rounded-lg p-2.5 pr-10 focus:outline-none"
+                          className="w-full text-sm border border-slate-200 rounded-lg p-2.5 pr-10 focus:outline-none"
                         />
                         <span className="absolute right-3.5 top-2.5 text-xs text-slate-400 font-bold select-none">分钟</span>
                       </div>
@@ -575,7 +575,7 @@ export default function CheckInModal({
 
                     <button
                       type="submit"
-                      className="w-full bg-slate-900 hover:bg-slate-950 text-white font-bold py-2.5 rounded-lg text-xs tracking-wide transition-all shadow cursor-pointer active:scale-[0.99]"
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors shadow-sm tracking-wide transition-all shadow cursor-pointer active:scale-[0.99]"
                     >
                       提交本次运动打卡
                     </button>
@@ -586,14 +586,14 @@ export default function CheckInModal({
                 {activeCheckTab === "study" && (
                   <form onSubmit={handleStudySubmit} className="space-y-4">
                     <div className="space-y-1">
-                      <label className="text-[11px] text-slate-500 font-bold">学习研究内容 <span className="text-rose-500">*</span></label>
+                      <label className="text-xs text-slate-500 font-semibold">学习研究内容 <span className="text-rose-500">*</span></label>
                       <input
                         type="text"
                         required
                         placeholder="例如：阅读《明朝那些事》、复习人工智能微调课程..."
                         value={studyContent}
                         onChange={(e) => setStudyContent(e.target.value)}
-                        className="w-full text-xs border border-slate-205 rounded-lg p-2.5 Focus:outline-none bg-slate-50 text-slate-800"
+                        className="w-full text-sm border border-slate-200 rounded-lg p-2.5 Focus:outline-none bg-slate-50 text-slate-800"
                       />
 
                       {/* Popular presets */}
@@ -603,7 +603,7 @@ export default function CheckInModal({
                             key={tag}
                             type="button"
                             onClick={() => setStudyContent(tag)}
-                            className="px-2 py-1 text-[9.5px] border border-slate-200 rounded-full hover:bg-slate-50 text-slate-600 cursor-pointer transition-colors"
+                            className="px-2.5 py-1 text-xs border border-slate-200 rounded-full hover:bg-slate-100/70 text-slate-650 cursor-pointer transition-colors"
                           >
                             + {tag}
                           </button>
@@ -612,7 +612,7 @@ export default function CheckInModal({
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-[11px] text-slate-500 font-bold">专注学习修行时长 (单位：分钟) <span className="text-rose-500">*</span></label>
+                      <label className="text-xs text-slate-500 font-semibold">专注学习修行时长 (单位：分钟) <span className="text-rose-500">*</span></label>
                       <div className="relative">
                         <input
                           type="number"
@@ -621,7 +621,7 @@ export default function CheckInModal({
                           placeholder="例如：45"
                           value={studyDuration}
                           onChange={(e) => setStudyDuration(e.target.value ? Number(e.target.value) : "")}
-                          className="w-full text-xs border border-slate-205 rounded-lg p-2.5 pr-10 focus:outline-none"
+                          className="w-full text-sm border border-slate-200 rounded-lg p-2.5 pr-10 focus:outline-none"
                         />
                         <span className="absolute right-3.5 top-2.5 text-xs text-slate-400 font-bold select-none">分钟</span>
                       </div>
@@ -629,7 +629,7 @@ export default function CheckInModal({
 
                     <button
                       type="submit"
-                      className="w-full bg-slate-900 hover:bg-slate-950 text-white font-bold py-2.5 rounded-lg text-xs tracking-wide transition-all shadow cursor-pointer active:scale-[0.99]"
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors shadow-sm tracking-wide transition-all shadow cursor-pointer active:scale-[0.99]"
                     >
                       提交今日学习打卡
                     </button>
@@ -640,7 +640,7 @@ export default function CheckInModal({
                 {activeCheckTab === "water" && (
                   <form onSubmit={handleWaterSubmit} className="space-y-5">
                     <div className="space-y-1">
-                      <label className="text-[11px] text-slate-500 font-bold block mb-1.5">本次补水摄入量 (毫升) <span className="text-rose-500">*</span></label>
+                      <label className="text-xs text-slate-500 font-semibold block mb-1.5">本次补水摄入量 (毫升) <span className="text-rose-500">*</span></label>
                       
                       {/* Presets Grid */}
                       <div className="grid grid-cols-3 gap-2.5 mb-4">
@@ -652,11 +652,11 @@ export default function CheckInModal({
                             className={`py-3.5 rounded-xl border text-xs font-black transition-all cursor-pointer ${
                               waterAmount === amount 
                                 ? "bg-slate-900 border-slate-900 text-white shadow-md scale-102" 
-                                : "bg-slate-50 border-slate-205 text-slate-700 hover:bg-slate-100"
+                                : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
                             }`}
                           >
                             🥤 {amount} ml
-                            {amount === 250 && <span className="text-[8px] font-bold block text-inherit opacity-80">(推荐一杯)</span>}
+                            {amount === 250 && <span className="text-xs font-semibold block text-inherit opacity-85">(推荐一杯)</span>}
                           </button>
                         ))}
                       </div>
@@ -671,7 +671,7 @@ export default function CheckInModal({
                           placeholder="自定义水量"
                           value={waterAmount}
                           onChange={(e) => setWaterAmount(Number(e.target.value))}
-                          className="w-full text-xs border border-slate-205 rounded-xl p-2.5 pr-10 focus:outline-none"
+                          className="w-full text-sm border border-slate-200 rounded-xl p-2.5 pr-10 focus:outline-none"
                         />
                         <span className="absolute right-3.5 top-2.5 text-xs text-slate-400 font-bold select-none">ml</span>
                       </div>
@@ -679,7 +679,7 @@ export default function CheckInModal({
 
                     <button
                       type="submit"
-                      className="w-full bg-slate-900 hover:bg-slate-950 text-white font-bold py-2.5 rounded-lg text-xs tracking-wide transition-all shadow cursor-pointer active:scale-[0.99] flex items-center justify-center gap-1.5"
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors shadow-sm tracking-wide transition-all shadow cursor-pointer active:scale-[0.99] flex items-center justify-center gap-1.5"
                     >
                       <Droplet size={12} className="animate-pulse" />
                       <span>确认补水打卡</span>
@@ -690,7 +690,7 @@ export default function CheckInModal({
                 {activeCheckTab === "weight" && (
                   <form onSubmit={handleWeightSubmit} className="space-y-4">
                     <div className="space-y-1">
-                      <label className="text-[11px] text-slate-500 font-bold">今日体重 (kg) <span className="text-rose-500">*</span></label>
+                      <label className="text-xs text-slate-500 font-semibold">今日体重 (kg) <span className="text-rose-500">*</span></label>
                       <div className="relative">
                         <input
                           type="number"
@@ -701,26 +701,26 @@ export default function CheckInModal({
                           placeholder="例如：65.5"
                           value={weightValue}
                           onChange={(e) => setWeightValue(e.target.value ? Number(e.target.value) : "")}
-                          className="w-full text-xs border border-slate-205 rounded-lg p-2.5 pr-10 focus:outline-none"
+                          className="w-full text-sm border border-slate-200 rounded-lg p-2.5 pr-10 focus:outline-none"
                         />
                         <span className="absolute right-3.5 top-2.5 text-xs text-slate-400 font-bold select-none">kg</span>
                       </div>
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-[11px] text-slate-500 font-bold">体重备注 (选填)</label>
+                      <label className="text-xs text-slate-500 font-semibold">体重备注 (选填)</label>
                       <input
                         type="text"
                         placeholder="例如：晨起空腹、晚餐后..."
                         value={weightNote}
                         onChange={(e) => setWeightNote(e.target.value)}
-                        className="w-full text-xs border border-slate-205 rounded-lg p-2.5 bg-slate-50 text-slate-800 focus:outline-none"
+                        className="w-full text-sm border border-slate-200 rounded-lg p-2.5 bg-slate-50 text-slate-800 focus:outline-none"
                       />
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full bg-slate-900 hover:bg-slate-950 text-white font-bold py-2.5 rounded-lg text-xs tracking-wide transition-all shadow cursor-pointer active:scale-[0.99] flex items-center justify-center gap-1.5"
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors shadow-sm tracking-wide transition-all shadow cursor-pointer active:scale-[0.99] flex items-center justify-center gap-1.5"
                     >
                       <Scale size={12} className="animate-pulse" />
                       <span>确认记录体重</span>
@@ -729,7 +729,7 @@ export default function CheckInModal({
                 )}
 
                 {errorText && (
-                  <p className="text-[10px] text-rose-500 font-semibold text-center mt-2">{errorText}</p>
+                  <p className="text-xs text-rose-600 font-semibold text-center mt-2">{errorText}</p>
                 )}
               </motion.div>
             )}
