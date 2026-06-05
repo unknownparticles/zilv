@@ -1851,6 +1851,15 @@ export default function App() {
                           </h3>
                           <p className="text-[10px] text-slate-400 font-medium mt-0.5">合并常规打卡与今日誓愿，一步到位管理日常自律</p>
                         </div>
+                        <button
+                          onClick={() => {
+                            setCheckInDefaultTab("sleep");
+                            setIsCheckInOpen(true);
+                          }}
+                          className="bg-slate-900 hover:bg-slate-950 text-white font-extrabold px-3 py-1.5 rounded-xl text-[10.5px] transition-all active:scale-95 cursor-pointer flex items-center gap-1 shadow-sm shrink-0"
+                        >
+                          <span>⚡ 快速打卡</span>
+                        </button>
                       </div>
 
                       {/* 1. Daily Discipline Metrics Grid */}
