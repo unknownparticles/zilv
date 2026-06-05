@@ -167,6 +167,12 @@ export default function App() {
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
 
+  const [checkInDefaultTab, setCheckInDefaultTab] = useState<"sleep" | "diet" | "workout" | "study" | "water" | "weight">("sleep");
+  const [quickTaskText, setQuickTaskText] = useState("");
+  const [quickTaskPeriod, setQuickTaskPeriod] = useState<"today" | "week" | "month">("today");
+  const [quickTaskTime, setQuickTaskTime] = useState("");
+  const [taskFilter, setTaskFilter] = useState<"all" | "today" | "week" | "month">("all");
+
   // States loaded from local storage
   const [sleepRecords, setSleepRecords] = useState<SleepRecord[]>(() => {
     const raw = localStorage.getItem("min_sleep_records");
@@ -773,6 +779,37 @@ export default function App() {
     } catch {
       return 8;
     }
+  };
+
+  const handleQuickAddTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickTaskText.trim()) return;
+
+    const formattedTime = quickTaskTime.trim() ? quickTaskTime.trim() : "⏰ 全天";
+    const newTask: MustDoTask = {
+      id: crypto.randomUUID(),
+      period: quickTaskPeriod,
+      text: quickTaskText.trim(),
+      time: formattedTime,
+      completed: false,
+      createdAt: new Date().toISOString().split("T")[0],
+    };
+
+    setMustDoTasks([...mustDoTasks, newTask]);
+    setQuickTaskText("");
+    setQuickTaskTime("");
+  };
+
+  const handleAddWeight = (rec: { weight: number; note?: string }) => {
+    const todayStr = new Date().toISOString().split("T")[0];
+    const newRecord: WeightRecord = {
+      id: crypto.randomUUID(),
+      date: todayStr,
+      time: new Date().toTimeString().split(" ")[0].slice(0, 5), // "HH:MM"
+      weight: rec.weight,
+      note: rec.note,
+    };
+    setWeightRecords([newRecord, ...weightRecords]);
   };
 
   // Must-do list manager
@@ -1803,36 +1840,372 @@ export default function App() {
                       )}
                     </div>
 
-                    {/* 2. BIG PROMINENT CIRCULAR CHECK-IN BUTTON IN THE MIDDLE */}
-                    <div className="flex flex-col items-center justify-center py-12 select-none bg-radial from-slate-100 to-slate-200/20 rounded-3xl border border-slate-200 p-8 min-h-[320px] shadow-sm">
-                      
-                      <div className="text-center space-y-1 mb-8">
-                        <span className="text-[10px] bg-slate-900 border border-slate-850 text-emerald-400 font-extrabold tracking-widest px-3 py-1 rounded-full uppercase shadow-xs">
-                          ⚡ 快捷自律打卡大厅
-                        </span>
-                        <h3 className="text-sm font-black text-slate-800 tracking-tight pt-1">点击正中印章 · 立证每日清修</h3>
+                    {/* 🏆 今日修行大底盘 (Daily Discipline Center) */}
+                    <div className="bg-white/80 backdrop-blur-md rounded-3xl border border-slate-200 p-6 shadow-sm space-y-6">
+                      {/* Header */}
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div>
+                          <h3 className="text-sm font-black text-slate-800 tracking-tight flex items-center gap-1.5">
+                            <span>🏆 今日修行大底盘</span>
+                            <span className="text-[10px] bg-slate-900 text-emerald-450 font-bold px-2 py-0.5 rounded-full">DDC</span>
+                          </h3>
+                          <p className="text-[10px] text-slate-400 font-medium mt-0.5">合并常规打卡与今日誓愿，一步到位管理日常自律</p>
+                        </div>
                       </div>
 
-                      {/* Giant pristine interactive circle */}
-                      <div className="relative">
-                        {/* Ripple pulses */}
-                        <div className="absolute inset-0 bg-slate-900/10 rounded-full animate-ping pointer-events-none scale-110" />
-                        <div className="absolute -inset-6 bg-emerald-500/5 rounded-full animate-pulse pointer-events-none" />
+                      {/* 1. Daily Discipline Metrics Grid */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-[10px] text-slate-400 font-black tracking-wider uppercase flex items-center gap-1">
+                            <span>⚡ 常规修行指标打卡</span>
+                          </h4>
+                          <span className="text-[9px] text-slate-400 font-semibold">点击指标卡片直接登记</span>
+                        </div>
 
-                        <button
-                          onClick={() => setIsCheckInOpen(true)}
-                          className="h-36 w-36 rounded-full bg-slate-900 hover:bg-slate-950 text-white font-black flex flex-col items-center justify-center transition-all shadow-2xl hover:scale-105 active:scale-95 cursor-pointer border-4 border-white relative z-10"
-                        >
-                          <span className="text-3xl animate-bounce">⚡</span>
-                          <span className="text-xs font-black tracking-widest mt-1.5 select-none">
-                            一键打卡
-                          </span>
-                        </button>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {/* 1. Sleep */}
+                          {(() => {
+                            const todaySleep = activeCheckIns.sleeps[0];
+                            const isDone = !!todaySleep;
+                            return (
+                              <button
+                                onClick={() => {
+                                  setCheckInDefaultTab("sleep");
+                                  setIsCheckInOpen(true);
+                                }}
+                                className={`text-left p-3 rounded-2xl border transition-all duration-200 active:scale-97 cursor-pointer flex flex-col justify-between min-h-[76px] relative overflow-hidden group ${
+                                  isDone
+                                    ? "bg-gradient-to-br from-indigo-900 to-blue-950 border-indigo-950 text-white shadow-sm hover:opacity-95"
+                                    : "bg-slate-50/50 border-slate-200 hover:bg-slate-50 text-slate-700 hover:border-slate-300"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between w-full">
+                                  <div className={`p-1 rounded-lg ${isDone ? "bg-white/10 text-indigo-300" : "bg-slate-100 text-slate-500"}`}>
+                                    <Moon size={13} />
+                                  </div>
+                                  {isDone && <Check size={12} className="text-emerald-400 stroke-[3.5]" />}
+                                </div>
+                                <div className="mt-2">
+                                  <p className="text-[10px] font-bold opacity-80">作息起居 🛌</p>
+                                  <p className="text-[11px] font-black truncate mt-0.5">
+                                    {isDone ? `${todaySleep.wakeTime} 起床 (${todaySleep.duration}h)` : "等待登记"}
+                                  </p>
+                                </div>
+                              </button>
+                            );
+                          })()}
+
+                          {/* 2. Diet */}
+                          {(() => {
+                            const mealCount = activeCheckIns.meals.length;
+                            const isDone = mealCount > 0;
+                            return (
+                              <button
+                                onClick={() => {
+                                  setCheckInDefaultTab("diet");
+                                  setIsCheckInOpen(true);
+                                }}
+                                className={`text-left p-3 rounded-2xl border transition-all duration-200 active:scale-97 cursor-pointer flex flex-col justify-between min-h-[76px] relative overflow-hidden group ${
+                                  isDone
+                                    ? "bg-gradient-to-br from-emerald-800 to-teal-950 border-emerald-950 text-white shadow-sm hover:opacity-95"
+                                    : "bg-slate-50/50 border-slate-200 hover:bg-slate-50 text-slate-700 hover:border-slate-300"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between w-full">
+                                  <div className={`p-1 rounded-lg ${isDone ? "bg-white/10 text-emerald-300" : "bg-slate-100 text-slate-500"}`}>
+                                    <Utensils size={13} />
+                                  </div>
+                                  {isDone && <Check size={12} className="text-emerald-300 stroke-[3.5]" />}
+                                </div>
+                                <div className="mt-2">
+                                  <p className="text-[10px] font-bold opacity-80">每日膳食 🍎</p>
+                                  <p className="text-[11px] font-black truncate mt-0.5">
+                                    {isDone ? `已登记 ${mealCount} 餐` : "等待登记"}
+                                  </p>
+                                </div>
+                              </button>
+                            );
+                          })()}
+
+                          {/* 3. Workout */}
+                          {(() => {
+                            const totalDuration = activeCheckIns.workouts.reduce((acc, w) => acc + w.duration, 0);
+                            const isDone = totalDuration > 0;
+                            return (
+                              <button
+                                onClick={() => {
+                                  setCheckInDefaultTab("workout");
+                                  setIsCheckInOpen(true);
+                                }}
+                                className={`text-left p-3 rounded-2xl border transition-all duration-200 active:scale-97 cursor-pointer flex flex-col justify-between min-h-[76px] relative overflow-hidden group ${
+                                  isDone
+                                    ? "bg-gradient-to-br from-orange-600 to-amber-955 border-orange-955 text-white shadow-sm hover:opacity-95"
+                                    : "bg-slate-50/50 border-slate-200 hover:bg-slate-50 text-slate-700 hover:border-slate-300"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between w-full">
+                                  <div className={`p-1 rounded-lg ${isDone ? "bg-white/10 text-orange-300" : "bg-slate-100 text-slate-500"}`}>
+                                    <Dumbbell size={13} />
+                                  </div>
+                                  {isDone && <Check size={12} className="text-orange-400 stroke-[3.5]" />}
+                                </div>
+                                <div className="mt-2">
+                                  <p className="text-[10px] font-bold opacity-80">运动汗水 🏋️‍♀️</p>
+                                  <p className="text-[11px] font-black truncate mt-0.5">
+                                    {isDone ? `已暴汗 ${totalDuration} 分` : "等待登记"}
+                                  </p>
+                                </div>
+                              </button>
+                            );
+                          })()}
+
+                          {/* 4. Study */}
+                          {(() => {
+                            const totalDuration = activeCheckIns.studies.reduce((acc, s) => acc + s.duration, 0);
+                            const isDone = totalDuration > 0;
+                            return (
+                              <button
+                                onClick={() => {
+                                  setCheckInDefaultTab("study");
+                                  setIsCheckInOpen(true);
+                                }}
+                                className={`text-left p-3 rounded-2xl border transition-all duration-200 active:scale-97 cursor-pointer flex flex-col justify-between min-h-[76px] relative overflow-hidden group ${
+                                  isDone
+                                    ? "bg-gradient-to-br from-purple-800 to-pink-950 border-purple-955 text-white shadow-sm hover:opacity-95"
+                                    : "bg-slate-50/50 border-slate-200 hover:bg-slate-50 text-slate-700 hover:border-slate-300"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between w-full">
+                                  <div className={`p-1 rounded-lg ${isDone ? "bg-white/10 text-purple-300" : "bg-slate-100 text-slate-500"}`}>
+                                    <BookOpen size={13} />
+                                  </div>
+                                  {isDone && <Check size={12} className="text-purple-300 stroke-[3.5]" />}
+                                </div>
+                                <div className="mt-2">
+                                  <p className="text-[10px] font-bold opacity-80">终身学习 📖</p>
+                                  <p className="text-[11px] font-black truncate mt-0.5">
+                                    {isDone ? `已专注 ${totalDuration} 分` : "等待登记"}
+                                  </p>
+                                </div>
+                              </button>
+                            );
+                          })()}
+
+                          {/* 5. Water */}
+                          {(() => {
+                            const totalAmount = activeCheckIns.waters.reduce((acc, w) => acc + w.amount, 0);
+                            const isDone = totalAmount > 0;
+                            return (
+                              <button
+                                onClick={() => {
+                                  setCheckInDefaultTab("water");
+                                  setIsCheckInOpen(true);
+                                }}
+                                className={`text-left p-3 rounded-2xl border transition-all duration-200 active:scale-97 cursor-pointer flex flex-col justify-between min-h-[76px] relative overflow-hidden group ${
+                                  isDone
+                                    ? "bg-gradient-to-br from-cyan-600 to-blue-900 border-cyan-955 text-white shadow-sm hover:opacity-95"
+                                    : "bg-slate-50/50 border-slate-200 hover:bg-slate-50 text-slate-700 hover:border-slate-300"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between w-full">
+                                  <div className={`p-1 rounded-lg ${isDone ? "bg-white/10 text-cyan-300" : "bg-slate-100 text-slate-500"}`}>
+                                    <Droplet size={13} />
+                                  </div>
+                                  {isDone && <Check size={12} className="text-cyan-300 stroke-[3.5]" />}
+                                </div>
+                                <div className="mt-2">
+                                  <p className="text-[10px] font-bold opacity-80">水杯盈盈 💧</p>
+                                  <p className="text-[11px] font-black truncate mt-0.5">
+                                    {isDone ? `已饮水 ${totalAmount} ml` : "等待登记"}
+                                  </p>
+                                </div>
+                              </button>
+                            );
+                          })()}
+
+                          {/* 6. Weight */}
+                          {(() => {
+                            const todayWeight = activeCheckIns.weights[0];
+                            const isDone = !!todayWeight;
+                            return (
+                              <button
+                                onClick={() => {
+                                  setCheckInDefaultTab("weight");
+                                  setIsCheckInOpen(true);
+                                }}
+                                className={`text-left p-3 rounded-2xl border transition-all duration-200 active:scale-97 cursor-pointer flex flex-col justify-between min-h-[76px] relative overflow-hidden group ${
+                                  isDone
+                                    ? "bg-gradient-to-br from-slate-750 to-slate-900 border-slate-900 text-white shadow-sm hover:opacity-95"
+                                    : "bg-slate-50/50 border-slate-200 hover:bg-slate-50 text-slate-700 hover:border-slate-300"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between w-full">
+                                  <div className={`p-1 rounded-lg ${isDone ? "bg-white/10 text-slate-300" : "bg-slate-100 text-slate-500"}`}>
+                                    <Scale size={13} />
+                                  </div>
+                                  {isDone && <Check size={12} className="text-slate-200 stroke-[3.5]" />}
+                                </div>
+                                <div className="mt-2">
+                                  <p className="text-[10px] font-bold opacity-80">体重监测 ⚖️</p>
+                                  <p className="text-[11px] font-black truncate mt-0.5">
+                                    {isDone ? `${todayWeight.weight} kg` : "等待登记"}
+                                  </p>
+                                </div>
+                              </button>
+                            );
+                          })()}
+                        </div>
                       </div>
 
-                      <p className="text-[10.5px] text-slate-450 font-bold tracking-tight mt-8 text-center leading-relaxed">
-                        支持：作息起居 🛌 · 膳食备注 🍎 · 运动汗水 🏋️ · 深度专注 📖
-                      </p>
+                      {/* 2. Custom Oath Checklist */}
+                      <div className="space-y-3 border-t border-slate-100 pt-5">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                          <h4 className="text-[10px] text-slate-400 font-black tracking-wider uppercase flex items-center gap-1.5">
+                            <span>🎯 自定义必做誓愿</span>
+                          </h4>
+                          
+                          {/* Filter Tabs */}
+                          <div className="flex bg-slate-100 p-0.5 rounded-lg border text-[9.5px]">
+                            {([
+                              { id: "all", label: "全部" },
+                              { id: "today", label: "今日" },
+                              { id: "week", label: "每周" },
+                              { id: "month", label: "每月" }
+                            ] as const).map((tab) => (
+                              <button
+                                key={tab.id}
+                                onClick={() => setTaskFilter(tab.id)}
+                                className={`px-2.5 py-0.5 rounded-md font-bold cursor-pointer transition-colors ${
+                                  taskFilter === tab.id
+                                    ? "bg-white text-slate-900 shadow-sm"
+                                    : "text-slate-500 hover:text-slate-900"
+                                }`}
+                              >
+                                {tab.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Checklist items */}
+                        {(() => {
+                          const filteredTasks = mustDoTasks.filter((t) => {
+                            if (taskFilter === "all") return true;
+                            return t.period === taskFilter;
+                          });
+
+                          if (filteredTasks.length === 0) {
+                            return (
+                              <div className="py-6 border border-dashed border-slate-200 rounded-2xl text-center space-y-1">
+                                <p className="text-xs text-slate-450 font-bold">当前无任何誓愿安排 ~</p>
+                                <p className="text-[9.5px] text-slate-400">可在下方直接快捷录入新的必做要求</p>
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
+                              {filteredTasks.map((task) => (
+                                <div
+                                  key={task.id}
+                                  className={`flex items-center justify-between p-2.5 rounded-xl border transition-all duration-200 group ${
+                                    task.completed
+                                      ? "bg-slate-50/50 border-slate-100 text-slate-405"
+                                      : "bg-white border-slate-200 hover:border-slate-350 text-slate-800"
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                    {/* Custom circular checkbox */}
+                                    <button
+                                      onClick={() => handleToggleTask(task.id)}
+                                      className={`h-5 w-5 rounded-full border flex items-center justify-center shrink-0 cursor-pointer transition-all duration-205 ${
+                                        task.completed
+                                          ? "bg-slate-900 border-slate-900 text-emerald-450"
+                                          : "border-slate-300 hover:border-emerald-500 hover:bg-emerald-50 text-transparent hover:text-emerald-500"
+                                      }`}
+                                    >
+                                      <Check size={11} className="stroke-[3.5]" />
+                                    </button>
+                                    
+                                    <div className="min-w-0 flex-1">
+                                      <p className={`text-xs font-semibold truncate ${task.completed ? "line-through text-slate-400" : "text-slate-800"}`}>
+                                        {task.text}
+                                      </p>
+                                      <div className="flex items-center gap-1.5 mt-0.5">
+                                        <span className={`text-[8.5px] px-1 rounded-sm font-black uppercase tracking-wider ${
+                                          task.period === "today"
+                                            ? "bg-emerald-50 text-emerald-700"
+                                            : task.period === "week"
+                                            ? "bg-blue-50 text-blue-700"
+                                            : "bg-amber-50 text-amber-700"
+                                        }`}>
+                                          {task.period === "today" ? "今日" : task.period === "week" ? "每周" : "本月"}
+                                        </span>
+                                        <span className="text-[8.5px] text-slate-400 font-semibold font-mono">
+                                          {task.time || "⏰ 全天"}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    onClick={() => handleDeleteTask(task.id)}
+                                    className="p-1 text-slate-300 hover:text-rose-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                                    title="废除此誓愿"
+                                  >
+                                    <Trash2 size={13} />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        })()}
+
+                        {/* Quick Add Form in home */}
+                        <form onSubmit={handleQuickAddTask} className="bg-slate-50 border border-slate-200 p-3 rounded-2xl space-y-2 text-xs">
+                          <div className="flex gap-2">
+                            {/* Period select */}
+                            <select
+                              value={quickTaskPeriod}
+                              onChange={(e) => setQuickTaskPeriod(e.target.value as any)}
+                              className="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[10.5px] font-bold text-slate-700 focus:outline-none shrink-0"
+                            >
+                              <option value="today">📅 今日必做</option>
+                              <option value="week">🗓️ 本周必做</option>
+                              <option value="month">📊 本月必做</option>
+                            </select>
+
+                            {/* Task detail */}
+                            <input
+                              type="text"
+                              required
+                              placeholder="快速添加下一个誓愿行动细节..."
+                              value={quickTaskText}
+                              onChange={(e) => setQuickTaskText(e.target.value)}
+                              className="flex-1 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[10.5px] text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-300 font-semibold"
+                            />
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {/* Time target */}
+                            <input
+                              type="text"
+                              placeholder="约束时间，例如：07:30、睡觉前 (选填)"
+                              value={quickTaskTime}
+                              onChange={(e) => setQuickTaskTime(e.target.value)}
+                              className="flex-1 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[10px] text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-300"
+                            />
+                            
+                            <button
+                              type="submit"
+                              className="bg-slate-900 hover:bg-slate-950 text-white font-black px-3 py-1.5 rounded-lg text-[10.5px] transition-transform active:scale-95 cursor-pointer shrink-0 flex items-center gap-0.5 shadow-sm"
+                            >
+                              <Plus size={12} className="stroke-[3]" />
+                              <span>新增誓愿</span>
+                            </button>
+                          </div>
+                        </form>
+                      </div>
                     </div>
 
                     {/* TODAY'S TIMELINE STREAM */}
@@ -3056,6 +3429,8 @@ export default function App() {
         onAddWorkout={handleAddWorkout}
         onAddStudy={handleAddStudy}
         onAddWater={handleAddWater}
+        onAddWeight={handleAddWeight}
+        defaultTab={checkInDefaultTab}
         isAnalyzingImage={isAnalyzingImage}
         setIsAnalyzingImage={setIsAnalyzingImage}
       />

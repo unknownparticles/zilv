@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Moon, Utensils, Dumbbell, BookOpen, Clock, Camera, Loader2, Check, X, Star, Droplet } from "lucide-react";
+import { Moon, Utensils, Dumbbell, BookOpen, Clock, Camera, Loader2, Check, X, Star, Droplet, Scale } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 interface CheckInModalProps {
@@ -11,8 +11,10 @@ interface CheckInModalProps {
   onAddWorkout: (record: { type: string; duration: number }) => void;
   onAddStudy: (record: { content: string; duration: number }) => void;
   onAddWater: (record: { amount: number }) => void;
+  onAddWeight: (record: { weight: number; note: string }) => void;
   isAnalyzingImage: boolean;
   setIsAnalyzingImage: (val: boolean) => void;
+  defaultTab?: "sleep" | "diet" | "workout" | "study" | "water" | "weight";
 }
 
 export default function CheckInModal({
@@ -24,10 +26,18 @@ export default function CheckInModal({
   onAddWorkout,
   onAddStudy,
   onAddWater,
+  onAddWeight,
   isAnalyzingImage,
   setIsAnalyzingImage,
+  defaultTab,
 }: CheckInModalProps) {
-  const [activeCheckTab, setActiveCheckTab] = useState<"sleep" | "diet" | "workout" | "study" | "water">("sleep");
+  const [activeCheckTab, setActiveCheckTab] = useState<"sleep" | "diet" | "workout" | "study" | "water" | "weight">("sleep");
+
+  useEffect(() => {
+    if (isOpen && defaultTab) {
+      setActiveCheckTab(defaultTab);
+    }
+  }, [isOpen, defaultTab]);
 
   // Sleep fields
   const [sleepTime, setSleepTime] = useState("23:00");
@@ -56,6 +66,10 @@ export default function CheckInModal({
 
   // Water fields
   const [waterAmount, setWaterAmount] = useState<number>(250);
+
+  // Weight fields
+  const [weightValue, setWeightValue] = useState<number | "">("");
+  const [weightNote, setWeightNote] = useState("");
 
   const [errorText, setErrorText] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -227,6 +241,18 @@ export default function CheckInModal({
     triggerSuccess(`补水打卡成功！摄入水份 ${waterAmount} ml 💧`);
   };
 
+  const handleWeightSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!weightValue) return;
+    onAddWeight({
+      weight: Number(weightValue),
+      note: weightNote.trim(),
+    });
+    triggerSuccess(`体重打卡成功！今日体重 ${weightValue} kg ⚖️`);
+    setWeightValue("");
+    setWeightNote("");
+  };
+
   const triggerSuccess = (msg: string) => {
     setSuccessMsg(msg);
     setTimeout(() => {
@@ -256,59 +282,68 @@ export default function CheckInModal({
         </div>
 
         {/* Tab Selection */}
-        <div className="grid grid-cols-5 border-b border-slate-100 bg-white p-1 gap-1 select-none text-center">
+        <div className="grid grid-cols-6 border-b border-slate-100 bg-white p-1 gap-0.5 select-none text-center">
           <button
             onClick={() => { setActiveCheckTab("sleep"); setErrorText(""); }}
-            className={`py-2 text-[11px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
+            className={`py-2 text-[10px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
               activeCheckTab === "sleep" ? "bg-slate-900 text-white font-bold" : "text-slate-500 hover:bg-slate-100"
             }`}
           >
-            <Moon size={14} />
-            <span>作息打卡</span>
+            <Moon size={13} />
+            <span>作息</span>
           </button>
 
           <button
             onClick={() => { setActiveCheckTab("diet"); setErrorText(""); }}
-            className={`py-2 text-[11px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
+            className={`py-2 text-[10px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
               activeCheckTab === "diet" ? "bg-slate-900 text-white font-bold" : "text-slate-500 hover:bg-slate-100"
             }`}
           >
-            <Utensils size={14} />
-            <span>饮食打卡</span>
+            <Utensils size={13} />
+            <span>饮食</span>
           </button>
 
           <button
             onClick={() => { setActiveCheckTab("workout"); setErrorText(""); }}
-            className={`py-2 text-[11px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
+            className={`py-2 text-[10px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
               activeCheckTab === "workout" ? "bg-slate-900 text-white font-bold" : "text-slate-500 hover:bg-slate-100"
             }`}
           >
-            <Dumbbell size={14} />
-            <span>运动打卡</span>
+            <Dumbbell size={13} />
+            <span>运动</span>
           </button>
 
           <button
             onClick={() => { setActiveCheckTab("study"); setErrorText(""); }}
-            className={`py-2 text-[11px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
+            className={`py-2 text-[10px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
               activeCheckTab === "study" ? "bg-slate-900 text-white font-bold" : "text-slate-500 hover:bg-slate-100"
             }`}
           >
-            <BookOpen size={14} />
-            <span>学习打卡</span>
+            <BookOpen size={13} />
+            <span>学习</span>
           </button>
 
           <button
             onClick={() => { setActiveCheckTab("water"); setErrorText(""); }}
-            className={`py-2 text-[11px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
+            className={`py-2 text-[10px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
               activeCheckTab === "water" ? "bg-slate-900 text-white font-bold" : "text-slate-500 hover:bg-slate-100"
             }`}
           >
-            <Droplet size={14} />
-            <span>喝水打卡</span>
+            <Droplet size={13} />
+            <span>喝水</span>
+          </button>
+
+          <button
+            onClick={() => { setActiveCheckTab("weight"); setErrorText(""); }}
+            className={`py-2 text-[10px] rounded-lg cursor-pointer flex flex-col items-center gap-1 transition-all ${
+              activeCheckTab === "weight" ? "bg-slate-900 text-white font-bold" : "text-slate-500 hover:bg-slate-100"
+            }`}
+          >
+            <Scale size={13} />
+            <span>体重</span>
           </button>
         </div>
 
-        {/* Body Form */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
           
           <AnimatePresence mode="wait">
@@ -648,6 +683,47 @@ export default function CheckInModal({
                     >
                       <Droplet size={12} className="animate-pulse" />
                       <span>确认补水打卡</span>
+                    </button>
+                  </form>
+                )}
+
+                {activeCheckTab === "weight" && (
+                  <form onSubmit={handleWeightSubmit} className="space-y-4">
+                    <div className="space-y-1">
+                      <label className="text-[11px] text-slate-500 font-bold">今日体重 (kg) <span className="text-rose-500">*</span></label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          step="0.01"
+                          required
+                          min={10}
+                          max={300}
+                          placeholder="例如：65.5"
+                          value={weightValue}
+                          onChange={(e) => setWeightValue(e.target.value ? Number(e.target.value) : "")}
+                          className="w-full text-xs border border-slate-205 rounded-lg p-2.5 pr-10 focus:outline-none"
+                        />
+                        <span className="absolute right-3.5 top-2.5 text-xs text-slate-400 font-bold select-none">kg</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] text-slate-500 font-bold">体重备注 (选填)</label>
+                      <input
+                        type="text"
+                        placeholder="例如：晨起空腹、晚餐后..."
+                        value={weightNote}
+                        onChange={(e) => setWeightNote(e.target.value)}
+                        className="w-full text-xs border border-slate-205 rounded-lg p-2.5 bg-slate-50 text-slate-800 focus:outline-none"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="w-full bg-slate-900 hover:bg-slate-950 text-white font-bold py-2.5 rounded-lg text-xs tracking-wide transition-all shadow cursor-pointer active:scale-[0.99] flex items-center justify-center gap-1.5"
+                    >
+                      <Scale size={12} className="animate-pulse" />
+                      <span>确认记录体重</span>
                     </button>
                   </form>
                 )}
